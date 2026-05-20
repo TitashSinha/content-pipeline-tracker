@@ -4,6 +4,149 @@ An internal tool for content agencies to manage articles from assignment through
 
 ---
 
+## Running Locally
+
+### What you need before starting
+
+- [Node.js 18+](https://nodejs.org) — check with `node -v`
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) — must be running before step 2
+
+---
+
+### Step 1 — Clone the repo
+
+```bash
+git clone https://github.com/TitashSinha/content-pipeline-tracker.git
+cd content-pipeline-tracker
+```
+
+---
+
+### Step 2 — Start the database
+
+This starts a PostgreSQL container locally. Make sure Docker Desktop is open first.
+
+```bash
+docker compose up -d
+```
+
+You should see `✔ Container content-pipeline-tracker-db-1 Started`. If you see an error, make sure Docker Desktop is running.
+
+---
+
+### Step 3 — Set up the backend
+
+Open a terminal in the project root:
+
+```bash
+cd backend
+```
+
+Copy the example environment file and open it:
+
+```bash
+cp .env.example .env
+```
+
+Open `backend/.env` in any text editor. It will look like this:
+
+```
+DATABASE_URL="postgresql://pipeline:pipeline_pass@localhost:5432/content_pipeline"
+PORT=3001
+JWT_SECRET="change-this-to-a-long-random-string"
+FRONTEND_URL="http://localhost:5173"
+RESEND_API_KEY="re_your_api_key_here"
+RESEND_FROM="Content Pipeline <noreply@yourdomain.com>"
+```
+
+For local use you only need to change `JWT_SECRET` — set it to any random string (e.g. `mysecretkey123`). Leave everything else as-is. `RESEND_API_KEY` is only needed if you want deadline emails to work locally.
+
+Install dependencies, push the schema, and seed the database:
+
+```bash
+npm install
+npm run db:push       # Creates all tables in Postgres
+npx prisma db seed    # Creates test users, clients, and article types
+```
+
+Start the backend:
+
+```bash
+npm run dev
+```
+
+You should see:
+```
+Backend running on http://localhost:3001
+[deadline-reminder] Job scheduled — runs daily at 08:00
+```
+
+---
+
+### Step 4 — Set up the frontend
+
+Open a **second terminal** in the project root:
+
+```bash
+cd frontend
+```
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+The `.env` file already points to `http://localhost:3001` — no changes needed.
+
+Install dependencies and start the dev server:
+
+```bash
+npm install
+npm run dev
+```
+
+You should see:
+```
+  VITE ready in Xms
+  ➜  Local:   http://localhost:5173/
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+### Step 5 — Log in
+
+Use these test accounts:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@agency.com | password123 |
+| Writer | sarah@agency.com | password123 |
+| Writer | james@agency.com | password123 |
+
+---
+
+### Stopping the app
+
+```bash
+# Stop the frontend: Ctrl+C in the frontend terminal
+# Stop the backend: Ctrl+C in the backend terminal
+# Stop the database:
+docker compose down
+```
+
+To wipe the database and start fresh:
+
+```bash
+docker compose down -v   # -v removes the data volume
+docker compose up -d
+# Then re-run: npm run db:push and npx prisma db seed
+```
+
+---
+
 ## User Roles
 
 ### Admin
@@ -12,7 +155,6 @@ An internal tool for content agencies to manage articles from assignment through
 - View the full dashboard — active count, overdue, completions this month, workload per writer
 - Filter and search the article list by title, status, or writer
 - Export the current view to CSV
-- Change any article's status at any time
 
 ### Writer
 - See only articles assigned to them
@@ -67,18 +209,18 @@ Writers can move in both directions at every stage.
 content-pipeline-tracker/
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma      # Database schema
-│   │   └── seed.js            # Seed users, clients, article types
+│   │   ├── schema.prisma           # Database schema
+│   │   └── seed.js                 # Seed users, clients, article types
 │   ├── src/
-│   │   ├── index.js           # Express app entry point
+│   │   ├── index.js                # Express app entry point
 │   │   ├── jobs/
-│   │   │   └── deadlineReminder.js  # Daily cron job
+│   │   │   └── deadlineReminder.js # Daily cron job
 │   │   ├── lib/
 │   │   │   ├── asyncHandler.js
-│   │   │   ├── mailer.js      # Resend email helper
-│   │   │   └── prisma.js      # Shared Prisma client
+│   │   │   ├── mailer.js           # Resend email helper
+│   │   │   └── prisma.js           # Shared Prisma client
 │   │   ├── middleware/
-│   │   │   └── auth.js        # JWT + role middleware
+│   │   │   └── auth.js             # JWT + role middleware
 │   │   └── routes/
 │   │       ├── articles.js
 │   │       ├── articleTypes.js
@@ -90,78 +232,19 @@ content-pipeline-tracker/
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── api/client.js      # Fetch wrapper
-│   │   ├── components/        # Shared + admin components
-│   │   ├── context/           # Auth context
+│   │   ├── api/client.js           # Fetch wrapper
+│   │   ├── components/             # Shared + admin components
+│   │   ├── context/                # Auth context
 │   │   ├── pages/
-│   │   │   ├── admin/         # Admin dashboard
-│   │   │   └── writer/        # Writer dashboard + article detail
-│   │   └── routes/            # ProtectedRoute
+│   │   │   ├── admin/              # Admin dashboard
+│   │   │   └── writer/             # Writer dashboard + article detail
+│   │   └── routes/                 # ProtectedRoute
 │   ├── .env.example
 │   └── vercel.json
 ├── docker-compose.yml
-├── render.yaml                # Render deployment config
+├── render.yaml                     # Render deployment config
 └── README.md
 ```
-
----
-
-## Running Locally
-
-### Prerequisites
-- Node.js 18+
-- Docker Desktop
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/TitashSinha/content-pipeline-tracker.git
-cd content-pipeline-tracker
-```
-
-### 2. Start the database
-
-```bash
-docker compose up -d
-```
-
-### 3. Set up the backend
-
-```bash
-cd backend
-cp .env.example .env
-# Edit .env and fill in JWT_SECRET (anything works locally)
-npm install
-npm run db:push    # Creates the schema in Postgres
-npx prisma db seed # Seeds users, clients, and article types
-npm run dev
-```
-
-Backend runs on `http://localhost:3001`.
-
-### 4. Set up the frontend
-
-Open a second terminal:
-
-```bash
-cd frontend
-cp .env.example .env
-# .env already points to http://localhost:3001 — no changes needed
-npm install
-npm run dev
-```
-
-Frontend runs on `http://localhost:5173`.
-
----
-
-## Test Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@agency.com | password123 |
-| Writer | sarah@agency.com | password123 |
-| Writer | james@agency.com | password123 |
 
 ---
 
@@ -169,20 +252,20 @@ Frontend runs on `http://localhost:5173`.
 
 ### Backend (`backend/.env`)
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `PORT` | Port to listen on (default: 3001) |
-| `JWT_SECRET` | Secret for signing JWTs — use a long random string in production |
-| `FRONTEND_URL` | Your frontend URL — used to restrict CORS in production |
-| `RESEND_API_KEY` | API key from resend.com |
-| `RESEND_FROM` | Sender address (e.g. `Content Pipeline <noreply@yourdomain.com>`) |
+| Variable | Required locally | Description |
+|----------|-----------------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `PORT` | No | Port to listen on (default: 3001) |
+| `JWT_SECRET` | Yes | Any random string locally; use a long secret in production |
+| `FRONTEND_URL` | No | Restricts CORS to this origin in production; not needed locally |
+| `RESEND_API_KEY` | No | Only needed if you want deadline reminder emails to work |
+| `RESEND_FROM` | No | Sender address for reminder emails |
 
 ### Frontend (`frontend/.env`)
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | Backend URL (e.g. `https://your-api.onrender.com`) |
+| Variable | Required locally | Description |
+|----------|-----------------|-------------|
+| `VITE_API_URL` | No | Backend URL — defaults to `http://localhost:3001` if not set |
 
 ---
 
@@ -196,7 +279,7 @@ Frontend runs on `http://localhost:5173`.
 - Add all backend env vars in the Render dashboard
 
 ### Database → Neon
-- Create a project at neon.tech
+- Create a project at [neon.tech](https://neon.tech)
 - Copy the connection string into `DATABASE_URL` on Render
 - Prisma handles schema sync automatically on each deploy
 
