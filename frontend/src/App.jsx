@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './routes/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminArticlePage from './pages/admin/AdminArticlePage'
 import WriterDashboard from './pages/writer/WriterDashboard'
 import WriterArticlePage from './pages/writer/WriterArticlePage'
 
@@ -23,6 +24,11 @@ export default function App() {
           <Route
             path="/admin"
             element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>}
+          />
+
+          <Route
+            path="/admin/articles/:id"
+            element={<ProtectedRoute role="ADMIN"><AdminArticlePage /></ProtectedRoute>}
           />
 
           <Route

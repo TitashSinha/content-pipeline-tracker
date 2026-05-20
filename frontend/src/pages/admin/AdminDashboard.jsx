@@ -1,9 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
 import ArticleForm from '../../components/admin/ArticleForm'
 import ConfirmDialog from '../../components/admin/ConfirmDialog'
 import { apiFetch } from '../../api/client'
+
+const PAGE_SIZE = 20
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -195,6 +198,7 @@ export default function AdminDashboard() {
   const [search,        setSearch]        = useState('')
   const [filterStatus,  setFilterStatus]  = useState('')
   const [filterWriter,  setFilterWriter]  = useState('')
+  const [currentPage,   setCurrentPage]   = useState(1)
 
   // ── Data loading ────────────────────────────────────────────────────────────
 
@@ -223,12 +227,18 @@ export default function AdminDashboard() {
 
   // ── Filtered list (client-side) ─────────────────────────────────────────────
 
-  const filtered = useMemo(() => articles.filter(a => {
-    if (search       && !a.title.toLowerCase().includes(search.toLowerCase())) return false
-    if (filterStatus && a.status !== filterStatus)                              return false
-    if (filterWriter && String(a.assignedWriter.id) !== filterWriter)           return false
-    return true
-  }), [articles, search, filterStatus, filterWriter])
+  const filtered = useMemo(() => {
+    setCurrentPage(1)
+    return articles.filter(a => {
+      if (search       && !a.title.toLowerCase().includes(search.toLowerCase())) return false
+      if (filterStatus && a.status !== filterStatus)                              return false
+      if (filterWriter && String(a.assignedWriter.id) !== filterWriter)           return false
+      return true
+    })
+  }, [articles, search, filterStatus, filterWriter])
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const overdueCount = useMemo(() => articles.filter(isOverdue).length, [articles])
 
@@ -355,23 +365,25 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((a) => {
+              {paginated.map((a) => {
                 const overdue = isOverdue(a)
                 return (
                   <tr key={a.id} className={overdue ? 'row--overdue' : ''}>
-                    <td>
+                    <td data-label="Title">
                       <div className="td-title">
-                        <span className="article-title">{a.title}</span>
+                        <Link className="article-title-link" to={`/admin/articles/${a.id}`}>
+                          {a.title}
+                        </Link>
                         {overdue && <span className="overdue-tag">Overdue</span>}
                       </div>
                     </td>
-                    <td>{a.assignedWriter.name}</td>
-                    <td>{a.client.name}</td>
-                    <td>{a.articleType.name}</td>
-                    <td className={overdue ? 'td-date--overdue' : ''}>
+                    <td data-label="Writer">{a.assignedWriter.name}</td>
+                    <td data-label="Client">{a.client.name}</td>
+                    <td data-label="Type">{a.articleType.name}</td>
+                    <td data-label="Deadline" className={overdue ? 'td-date--overdue' : ''}>
                       {formatDate(a.deadline)}
                     </td>
-                    <td><StatusBadge status={a.status} /></td>
+                    <td data-label="Status"><StatusBadge status={a.status} /></td>
                     <td className="td-actions">
                       <button
                         className="btn-action"
@@ -391,6 +403,27 @@ export default function AdminDashboard() {
               })}
             </tbody>
           </table>
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              className="btn-secondary pagination-btn"
+              onClick={() => setCurrentPage(p => p - 1)}
+              disabled={currentPage === 1}
+            >
+              ← Prev
+            </button>
+            <span className="pagination-info">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className="btn-secondary pagination-btn"
+              onClick={() => setCurrentPage(p => p + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next →
+            </button>
+          </div>
+        )}
         </div>
       )}
 
