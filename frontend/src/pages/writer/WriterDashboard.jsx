@@ -3,18 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
 import { apiFetch } from '../../api/client'
-
-function isOverdue(article) {
-  if (!article.deadline || article.status === 'COMPLETED') return false
-  return new Date(article.deadline) < new Date()
-}
-
-function formatDate(str) {
-  if (!str) return 'No deadline set'
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  }).format(new Date(str))
-}
+import { formatDate, isOverdue } from '../../lib/utils'
 
 // ─── Article card ─────────────────────────────────────────────────────────────
 
@@ -36,7 +25,7 @@ function ArticleCard({ article, onClick }) {
       </div>
       <div className={`article-card-deadline ${overdue ? 'article-card-deadline--overdue' : ''}`}>
         {overdue && <span className="overdue-tag">Overdue</span>}
-        <span>{formatDate(article.deadline)}</span>
+        <span>{formatDate(article.deadline, 'No deadline set')}</span>
       </div>
     </button>
   )

@@ -2,19 +2,13 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
+import Stepper from '../../components/Stepper'
+import TimelineEntry from '../../components/TimelineEntry'
 import { apiFetch } from '../../api/client'
+import { formatDate, isOverdue } from '../../lib/utils'
+import { STATUSES } from '../../lib/constants'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const STATUSES = ['BRIEF_PENDING', 'WRITING', 'REVIEW', 'REVISION', 'COMPLETED']
-
-const STATUS_LABELS = {
-  BRIEF_PENDING: 'Brief Pending',
-  WRITING:       'Writing',
-  REVIEW:        'Review',
-  REVISION:      'Revision',
-  COMPLETED:     'Completed',
-}
 
 // Forward progression — null means already at the end
 const NEXT_STATUS = {
@@ -46,86 +40,6 @@ const BACK_LABEL = {
   REVIEW:    '← Back to Writing',
   REVISION:  '← Back to Review',
   COMPLETED: '← Back to Revision',
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatDate(str) {
-  if (!str) return '—'
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  }).format(new Date(str))
-}
-
-function formatDateTime(str) {
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  }).format(new Date(str))
-}
-
-function isOverdue(article) {
-  if (!article.deadline || article.status === 'COMPLETED') return false
-  return new Date(article.deadline) < new Date()
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function Stepper({ currentStatus }) {
-  const currentStep = STATUSES.indexOf(currentStatus)
-  return (
-    <div className="stepper">
-      {STATUSES.map((s, i) => (
-        <div
-          key={s}
-          className={[
-            'stepper-step',
-            i < currentStep  ? 'step--done'    : '',
-            i === currentStep ? 'step--current' : '',
-          ].join(' ')}
-        >
-          <div className="stepper-dot-row">
-            <div className="stepper-dot">
-              {i < currentStep && <span>✓</span>}
-            </div>
-            {i < STATUSES.length - 1 && (
-              <div className={`stepper-connector ${i < currentStep ? 'stepper-connector--done' : ''}`} />
-            )}
-          </div>
-          <span className="stepper-label">{STATUS_LABELS[s]}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function TimelineEntry({ log }) {
-  return (
-    <div className="timeline-entry">
-      <div className="timeline-dot" />
-      <div className="timeline-body">
-        <div className="timeline-header">
-          <span className="timeline-who">{log.changedBy.name}</span>
-          <span className="timeline-when">{formatDateTime(log.createdAt)}</span>
-        </div>
-        <div className="timeline-change">
-          {log.oldStatus ? (
-            <>
-              <StatusBadge status={log.oldStatus} />
-              <span className="timeline-arrow">→</span>
-              <StatusBadge status={log.newStatus} />
-            </>
-          ) : (
-            <>
-              <StatusBadge status={log.newStatus} />
-              <span className="timeline-pill">created</span>
-            </>
-          )}
-        </div>
-        {log.note && <p className="timeline-note">"{log.note}"</p>}
-      </div>
-    </div>
-  )
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

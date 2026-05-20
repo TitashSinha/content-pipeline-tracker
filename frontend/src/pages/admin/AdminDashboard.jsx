@@ -5,32 +5,10 @@ import StatusBadge from '../../components/StatusBadge'
 import ArticleForm from '../../components/admin/ArticleForm'
 import ConfirmDialog from '../../components/admin/ConfirmDialog'
 import { apiFetch } from '../../api/client'
+import { formatDate, isOverdue } from '../../lib/utils'
+import { STATUSES, STATUS_LABELS } from '../../lib/constants'
 
 const PAGE_SIZE = 20
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STATUS_LABELS = {
-  BRIEF_PENDING: 'Brief Pending',
-  WRITING:       'Writing',
-  REVIEW:        'Review',
-  REVISION:      'Revision',
-  COMPLETED:     'Completed',
-}
-
-const STATUSES = Object.keys(STATUS_LABELS)
-
-function formatDate(str) {
-  if (!str) return '—'
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  }).format(new Date(str))
-}
-
-function isOverdue(article) {
-  if (!article.deadline || article.status === 'COMPLETED') return false
-  return new Date(article.deadline) < new Date()
-}
 
 function exportToCSV(articles) {
   const headers = ['Title', 'Client', 'Article Type', 'Assigned Writer', 'Status', 'Deadline', 'Google Doc Link']
@@ -159,7 +137,7 @@ function DashboardStats({ articles, dashStats }) {
               </div>
               {hasMore && (
                 <button className="workload-show-more" onClick={() => setShowWorkloadModal(true)}>
-                  +{byWriter.length - WORKLOAD_PREVIEW} more writers
+                  + {byWriter.length - WORKLOAD_PREVIEW} more writers
                 </button>
               )}
             </>

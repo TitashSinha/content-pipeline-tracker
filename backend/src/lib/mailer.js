@@ -1,10 +1,14 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM = process.env.RESEND_FROM || 'Content Pipeline <onboarding@resend.dev>'
 
 export async function sendDeadlineReminder({ writerName, writerEmail, articleTitle, deadline }) {
+  if (!process.env.RESEND_API_KEY) {
+    console.log(`[mailer] RESEND_API_KEY not set — skipping email to ${writerEmail}`)
+    return
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const deadlineStr = new Intl.DateTimeFormat('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
