@@ -62,7 +62,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
       <div className="modal" role="dialog" aria-modal="true">
 
         <div className="modal-header">
-          <h3>{mode === 'create' ? 'New Article' : 'Edit Article'}</h3>
+          <h3>{mode === 'create' ? 'New Content' : 'Edit Content'}</h3>
           <button className="modal-close" onClick={onClose} disabled={saving} aria-label="Close">×</button>
         </div>
 
@@ -122,7 +122,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? 'Saving…' : mode === 'create' ? 'Create Article' : 'Save Changes'}
+              {saving ? 'Saving…' : mode === 'create' ? 'Create' : 'Save Changes'}
             </button>
           </div>
         </form>
