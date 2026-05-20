@@ -7,10 +7,11 @@ export default function LoginPage() {
   const { user, login } = useAuth()
   const navigate = useNavigate()
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email,       setEmail]       = useState('')
+  const [password,    setPassword]    = useState('')
+  const [showPass,    setShowPass]    = useState(false)
+  const [error,       setError]       = useState('')
+  const [loading,     setLoading]     = useState(false)
 
   // Already authenticated — send them to their area
   if (user) {
@@ -63,16 +64,27 @@ export default function LoginPage() {
 
           <div className="field">
             <label className="field-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              className="field-input"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
+            <div className="input-with-icon">
+              <input
+                id="password"
+                className="field-input"
+                type={showPass ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="input-icon-btn"
+                onClick={() => setShowPass(v => !v)}
+                tabIndex={-1}
+                aria-label={showPass ? 'Hide password' : 'Show password'}
+              >
+                {showPass ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           <button className="btn-primary btn-full" type="submit" disabled={loading}>
