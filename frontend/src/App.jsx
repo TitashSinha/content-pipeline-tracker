@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './routes/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
+import ChangePasswordPage from './pages/ChangePasswordPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminArticlePage from './pages/admin/AdminArticlePage'
 import WriterDashboard from './pages/writer/WriterDashboard'
@@ -39,6 +40,11 @@ export default function App() {
           <Route
             path="/writer/articles/:id"
             element={<ProtectedRoute role="WRITER"><WriterArticlePage /></ProtectedRoute>}
+          />
+
+          <Route
+            path="/change-password"
+            element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>}
           />
 
           <Route path="*" element={<Navigate to="/" replace />} />

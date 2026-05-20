@@ -40,4 +40,45 @@ router.post(
   })
 )
 
+// PATCH /api/auth/password
+// Body: { currentPassword, newPassword }
+// Requires valid JWT (any role)
+router.patch(
+  '/password',
+  asyncHandler(async (req, res) => {
+    const header = req.headers.authorization
+    if (!header?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
+
+    let payload
+    try {
+      payload = jwt.verify(header.split(' ')[1], process.env.JWT_SECRET)
+    } catch {
+      return res.status(401).json({ error: 'Invalid or expired token' })
+    }
+
+    const { currentPassword, newPassword } = req.body
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'currentPassword and newPassword are required' })
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' })
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: payload.id } })
+    if (!user) return res.status(404).json({ error: 'User not found' })
+
+    const valid = await bcrypt.compare(currentPassword, user.password)
+    if (!valid) return res.status(401).json({ error: 'Current password is incorrect' })
+
+    const hashed = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({ where: { id: user.id }, data: { password: hashed } })
+
+    res.json({ message: 'Password updated successfully' })
+  })
+)
+
 export default router

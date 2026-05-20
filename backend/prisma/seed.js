@@ -37,60 +37,72 @@ async function main() {
   console.log('✓ Clients')
 
   // ── Users ──────────────────────────────────────────────────────────────────
-  const password = await bcrypt.hash('password123', 10)
+  const password = await bcrypt.hash('Lexiconn@2025', 10)
 
   const admin = await prisma.user.upsert({
-    where:  { email: 'admin@agency.com' },
+    where:  { email: 'admin@lexiconn.in' },
     update: {},
-    create: { name: 'Admin User', email: 'admin@agency.com', password, role: 'ADMIN' },
+    create: { name: 'Admin', email: 'admin@lexiconn.in', password, role: 'ADMIN' },
   })
 
-  const sarah = await prisma.user.upsert({
-    where:  { email: 'sarah@agency.com' },
+  const nandakumar = await prisma.user.upsert({
+    where:  { email: 'nandakumar@lexiconn.in' },
     update: {},
-    create: { name: 'Sarah Chen', email: 'sarah@agency.com', password, role: 'WRITER' },
+    create: { name: 'Nandakumar Menon', email: 'nandakumar@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const james = await prisma.user.upsert({
-    where:  { email: 'james@agency.com' },
+  const abhijeet = await prisma.user.upsert({
+    where:  { email: 'abhijeet@lexiconn.in' },
     update: {},
-    create: { name: 'James Okafor', email: 'james@agency.com', password, role: 'WRITER' },
+    create: { name: 'Abhijeet Padhy', email: 'abhijeet@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const priya = await prisma.user.upsert({
-    where:  { email: 'priya@agency.com' },
+  const anjana = await prisma.user.upsert({
+    where:  { email: 'anjana@lexiconn.in' },
     update: {},
-    create: { name: 'Priya Nair', email: 'priya@agency.com', password, role: 'WRITER' },
+    create: { name: 'Anjana M R', email: 'anjana@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const marco = await prisma.user.upsert({
-    where:  { email: 'marco@agency.com' },
+  const dinu = await prisma.user.upsert({
+    where:  { email: 'dinu@lexiconn.in' },
     update: {},
-    create: { name: 'Marco Rossi', email: 'marco@agency.com', password, role: 'WRITER' },
+    create: { name: 'Dinu Varkey', email: 'dinu@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const aisha = await prisma.user.upsert({
-    where:  { email: 'aisha@agency.com' },
+  const harsh = await prisma.user.upsert({
+    where:  { email: 'harsh@lexiconn.in' },
     update: {},
-    create: { name: 'Aisha Malik', email: 'aisha@agency.com', password, role: 'WRITER' },
+    create: { name: 'Harsh Dugar', email: 'harsh@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const tom = await prisma.user.upsert({
-    where:  { email: 'tom@agency.com' },
+  const raavi = await prisma.user.upsert({
+    where:  { email: 'raavi@lexiconn.in' },
     update: {},
-    create: { name: 'Tom Brennan', email: 'tom@agency.com', password, role: 'WRITER' },
+    create: { name: 'Raavi Rathee', email: 'raavi@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const lena = await prisma.user.upsert({
-    where:  { email: 'lena@agency.com' },
+  const sakshi = await prisma.user.upsert({
+    where:  { email: 'sakshi@lexiconn.in' },
     update: {},
-    create: { name: 'Lena Fischer', email: 'lena@agency.com', password, role: 'WRITER' },
+    create: { name: 'Sakshi Bhatia', email: 'sakshi@lexiconn.in', password, role: 'WRITER' },
   })
 
-  const kai = await prisma.user.upsert({
-    where:  { email: 'kai@agency.com' },
+  const sameer = await prisma.user.upsert({
+    where:  { email: 'sameer@lexiconn.in' },
     update: {},
-    create: { name: 'Kai Tanaka', email: 'kai@agency.com', password, role: 'WRITER' },
+    create: { name: 'Sameer Saptiskar', email: 'sameer@lexiconn.in', password, role: 'WRITER' },
+  })
+
+  const taher = await prisma.user.upsert({
+    where:  { email: 'taher@lexiconn.in' },
+    update: {},
+    create: { name: 'Taher Rajgara', email: 'taher@lexiconn.in', password, role: 'WRITER' },
+  })
+
+  const titash = await prisma.user.upsert({
+    where:  { email: 'titash@lexiconn.in' },
+    update: {},
+    create: { name: 'Titash Sinha', email: 'titash@lexiconn.in', password, role: 'WRITER' },
   })
 
   console.log('✓ Users (password for all: password123)')
@@ -112,7 +124,7 @@ async function main() {
       status:           'WRITING',
       clientId:         clientId('Acme Corp'),
       articleTypeId:    typeId('Blog Post'),
-      assignedWriterId: sarah.id,
+      assignedWriterId: nandakumar.id,
       createdById:      admin.id,
       deadline:         days(5),
     },
@@ -121,7 +133,7 @@ async function main() {
       status:           'REVIEW',
       clientId:         clientId('Nova Digital'),
       articleTypeId:    typeId('Webpage Copy'),
-      assignedWriterId: james.id,
+      assignedWriterId: abhijeet.id,
       createdById:      admin.id,
       deadline:         days(3),
     },
@@ -130,7 +142,7 @@ async function main() {
       status:           'BRIEF_PENDING',
       clientId:         clientId('Greenleaf Organic'),
       articleTypeId:    typeId('Email Newsletter'),
-      assignedWriterId: priya.id,
+      assignedWriterId: anjana.id,
       createdById:      admin.id,
       deadline:         days(10),
     },
@@ -139,7 +151,7 @@ async function main() {
       status:           'REVISION',
       clientId:         clientId('Horizon Tech'),
       articleTypeId:    typeId('Case Study'),
-      assignedWriterId: sarah.id,
+      assignedWriterId: dinu.id,
       createdById:      admin.id,
       deadline:         days(2),
     },
@@ -148,7 +160,7 @@ async function main() {
       status:           'COMPLETED',
       clientId:         clientId('Peak Performance'),
       articleTypeId:    typeId('Article'),
-      assignedWriterId: james.id,
+      assignedWriterId: harsh.id,
       createdById:      admin.id,
       deadline:         days(-3),
     },
@@ -157,7 +169,7 @@ async function main() {
       status:           'WRITING',
       clientId:         clientId('Bright Ideas Ltd'),
       articleTypeId:    typeId('Social Post'),
-      assignedWriterId: priya.id,
+      assignedWriterId: raavi.id,
       createdById:      admin.id,
       deadline:         days(7),
     },
@@ -166,7 +178,7 @@ async function main() {
       status:           'REVIEW',
       clientId:         clientId('Acme Corp'),
       articleTypeId:    typeId('Press Release'),
-      assignedWriterId: sarah.id,
+      assignedWriterId: sakshi.id,
       createdById:      admin.id,
       deadline:         days(1),
     },
@@ -175,7 +187,7 @@ async function main() {
       status:           'BRIEF_PENDING',
       clientId:         clientId('Greenleaf Organic'),
       articleTypeId:    typeId('Product Description'),
-      assignedWriterId: james.id,
+      assignedWriterId: sameer.id,
       createdById:      admin.id,
       deadline:         days(14),
     },
@@ -184,7 +196,7 @@ async function main() {
       status:           'WRITING',
       clientId:         clientId('Horizon Tech'),
       articleTypeId:    typeId('Article'),
-      assignedWriterId: marco.id,
+      assignedWriterId: taher.id,
       createdById:      admin.id,
       deadline:         days(6),
     },
@@ -193,7 +205,7 @@ async function main() {
       status:           'BRIEF_PENDING',
       clientId:         clientId('Bright Ideas Ltd'),
       articleTypeId:    typeId('Email Newsletter'),
-      assignedWriterId: aisha.id,
+      assignedWriterId: titash.id,
       createdById:      admin.id,
       deadline:         days(9),
     },
@@ -202,7 +214,7 @@ async function main() {
       status:           'REVIEW',
       clientId:         clientId('Peak Performance'),
       articleTypeId:    typeId('Blog Post'),
-      assignedWriterId: tom.id,
+      assignedWriterId: nandakumar.id,
       createdById:      admin.id,
       deadline:         days(4),
     },
@@ -211,7 +223,7 @@ async function main() {
       status:           'WRITING',
       clientId:         clientId('Nova Digital'),
       articleTypeId:    typeId('Webpage Copy'),
-      assignedWriterId: lena.id,
+      assignedWriterId: abhijeet.id,
       createdById:      admin.id,
       deadline:         days(8),
     },
@@ -220,7 +232,7 @@ async function main() {
       status:           'BRIEF_PENDING',
       clientId:         clientId('Horizon Tech'),
       articleTypeId:    typeId('Social Post'),
-      assignedWriterId: kai.id,
+      assignedWriterId: anjana.id,
       createdById:      admin.id,
       deadline:         days(12),
     },
@@ -229,7 +241,7 @@ async function main() {
       status:           'REVISION',
       clientId:         clientId('Acme Corp'),
       articleTypeId:    typeId('Case Study'),
-      assignedWriterId: marco.id,
+      assignedWriterId: dinu.id,
       createdById:      admin.id,
       deadline:         days(3),
     },

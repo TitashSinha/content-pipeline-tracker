@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
@@ -20,6 +20,9 @@ export default function Navbar() {
             {user?.role === 'ADMIN' ? 'Admin' : 'Writer'}
           </span>
         </span>
+        <Link to="/change-password" className="btn-logout">
+          Change Password
+        </Link>
         <button className="btn-logout" onClick={handleLogout}>
           Log out
         </button>
