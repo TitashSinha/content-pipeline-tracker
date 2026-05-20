@@ -40,7 +40,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <h1 className="login-title">Content Pipeline</h1>
+          <h1 className="login-title">Content Pipeline Tracker</h1>
           <p className="login-subtitle">Sign in to your account</p>
         </div>
 
