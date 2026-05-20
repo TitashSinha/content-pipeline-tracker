@@ -125,6 +125,12 @@ Use these test accounts:
 | Admin | admin@agency.com | password123 |
 | Writer | sarah@agency.com | password123 |
 | Writer | james@agency.com | password123 |
+| Writer | priya@agency.com | password123 |
+| Writer | marco@agency.com | password123 |
+| Writer | aisha@agency.com | password123 |
+| Writer | tom@agency.com | password123 |
+| Writer | lena@agency.com | password123 |
+| Writer | kai@agency.com | password123 |
 
 ---
 

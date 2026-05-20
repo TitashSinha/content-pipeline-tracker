@@ -63,6 +63,36 @@ async function main() {
     create: { name: 'Priya Nair', email: 'priya@agency.com', password, role: 'WRITER' },
   })
 
+  const marco = await prisma.user.upsert({
+    where:  { email: 'marco@agency.com' },
+    update: {},
+    create: { name: 'Marco Rossi', email: 'marco@agency.com', password, role: 'WRITER' },
+  })
+
+  const aisha = await prisma.user.upsert({
+    where:  { email: 'aisha@agency.com' },
+    update: {},
+    create: { name: 'Aisha Malik', email: 'aisha@agency.com', password, role: 'WRITER' },
+  })
+
+  const tom = await prisma.user.upsert({
+    where:  { email: 'tom@agency.com' },
+    update: {},
+    create: { name: 'Tom Brennan', email: 'tom@agency.com', password, role: 'WRITER' },
+  })
+
+  const lena = await prisma.user.upsert({
+    where:  { email: 'lena@agency.com' },
+    update: {},
+    create: { name: 'Lena Fischer', email: 'lena@agency.com', password, role: 'WRITER' },
+  })
+
+  const kai = await prisma.user.upsert({
+    where:  { email: 'kai@agency.com' },
+    update: {},
+    create: { name: 'Kai Tanaka', email: 'kai@agency.com', password, role: 'WRITER' },
+  })
+
   console.log('✓ Users (password for all: password123)')
 
   // ── Lookup IDs ─────────────────────────────────────────────────────────────
@@ -72,8 +102,8 @@ async function main() {
   const typeId   = (name) => types.find(t => t.name === name)?.id
   const clientId = (name) => clients.find(c => c.name === name)?.id
 
-  const today  = new Date()
-  const days   = (n) => new Date(today.getTime() + n * 86400000)
+  const today = new Date()
+  const days  = (n) => new Date(today.getTime() + n * 86400000)
 
   // ── Sample Articles ────────────────────────────────────────────────────────
   const articles = [
@@ -149,6 +179,60 @@ async function main() {
       createdById:      admin.id,
       deadline:         days(14),
     },
+    {
+      title:            'B2B SaaS Onboarding Guide',
+      status:           'WRITING',
+      clientId:         clientId('Horizon Tech'),
+      articleTypeId:    typeId('Article'),
+      assignedWriterId: marco.id,
+      createdById:      admin.id,
+      deadline:         days(6),
+    },
+    {
+      title:            'Autumn Collection Launch — Email Series',
+      status:           'BRIEF_PENDING',
+      clientId:         clientId('Bright Ideas Ltd'),
+      articleTypeId:    typeId('Email Newsletter'),
+      assignedWriterId: aisha.id,
+      createdById:      admin.id,
+      deadline:         days(9),
+    },
+    {
+      title:            'Peak Performance — Athlete Spotlight Blog',
+      status:           'REVIEW',
+      clientId:         clientId('Peak Performance'),
+      articleTypeId:    typeId('Blog Post'),
+      assignedWriterId: tom.id,
+      createdById:      admin.id,
+      deadline:         days(4),
+    },
+    {
+      title:            'Nova Digital — Services Page Rewrite',
+      status:           'WRITING',
+      clientId:         clientId('Nova Digital'),
+      articleTypeId:    typeId('Webpage Copy'),
+      assignedWriterId: lena.id,
+      createdById:      admin.id,
+      deadline:         days(8),
+    },
+    {
+      title:            'Horizon Tech — LinkedIn Thought Leadership Series',
+      status:           'BRIEF_PENDING',
+      clientId:         clientId('Horizon Tech'),
+      articleTypeId:    typeId('Social Post'),
+      assignedWriterId: kai.id,
+      createdById:      admin.id,
+      deadline:         days(12),
+    },
+    {
+      title:            'Acme Corp — Annual Report Case Study',
+      status:           'REVISION',
+      clientId:         clientId('Acme Corp'),
+      articleTypeId:    typeId('Case Study'),
+      assignedWriterId: marco.id,
+      createdById:      admin.id,
+      deadline:         days(3),
+    },
   ]
 
   for (const data of articles) {
@@ -167,7 +251,6 @@ async function main() {
       },
     })
 
-    // Add a second log entry for articles that have progressed
     if (data.status !== 'BRIEF_PENDING') {
       await prisma.activityLog.create({
         data: {
