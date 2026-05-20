@@ -29,6 +29,30 @@ function isOverdue(article) {
   return new Date(article.deadline) < new Date()
 }
 
+function exportToCSV(articles) {
+  const headers = ['Title', 'Client', 'Article Type', 'Assigned Writer', 'Status', 'Deadline', 'Google Doc Link']
+  const rows = articles.map(a => [
+    a.title,
+    a.client.name,
+    a.articleType.name,
+    a.assignedWriter.name,
+    a.status,
+    formatDate(a.deadline),
+    a.googleDocLink || '',
+  ])
+  const csv = [headers, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href     = url
+  a.download = `content-export-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 // ─── Stats sub-components ─────────────────────────────────────────────────────
 
 function StatCard({ label, value, variant }) {
@@ -255,6 +279,14 @@ export default function AdminDashboard() {
         <div className="header-actions">
           <button className="btn-secondary" onClick={loadAll} disabled={loading} title="Refresh">
             ↻ Refresh
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => exportToCSV(filtered)}
+            disabled={filtered.length === 0}
+            title="Export current view as CSV"
+          >
+            ↓ Export CSV
           </button>
           <button className="btn-primary" onClick={() => setFormModal({ mode: 'create', article: null })}>
             + New Content

@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import prisma from './lib/prisma.js'
+import { startDeadlineReminderJob } from './jobs/deadlineReminder.js'
 
 import authRoutes from './routes/auth.js'
 import articleRoutes from './routes/articles.js'
@@ -13,7 +14,11 @@ import dashboardRoutes from './routes/dashboard.js'
 const app = express()
 const PORT = process.env.PORT || 3001
 
-app.use(cors())
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL]
+  : ['http://localhost:5173', 'http://localhost:4173']
+
+app.use(cors({ origin: allowedOrigins, credentials: true }))
 app.use(express.json())
 
 // ─── Health ───────────────────────────────────────────────────────────────────
@@ -52,4 +57,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`)
+  startDeadlineReminderJob()
 })

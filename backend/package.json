@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "db:generate": "prisma generate",
+    "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev"
   },
@@ -15,10 +15,10 @@
     "cors": "latest",
     "dotenv": "latest",
     "express": "latest",
-    "jsonwebtoken": "^9.0.3"
-  },
-  "devDependencies": {
-    "prisma": "^5.22.0"
+    "jsonwebtoken": "^9.0.3",
+    "node-cron": "^4.2.1",
+    "prisma": "^5.22.0",
+    "resend": "^6.12.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
