@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  WRITER
+}
+
+enum ArticleStatus {
+  BRIEF_PENDING
+  WRITING
+  REVIEW
+  REVISION
+  COMPLETED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(WRITER)
+  createdAt DateTime @default(now())
+
+  // An admin creates articles; a writer is assigned articles
+  createdArticles  Article[]     @relation("CreatedByAdmin")
+  assignedArticles Article[]     @relation("AssignedWriter")
+  activityLogs     ActivityLog[]
+}
+
+model Client {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+
+  articles Article[]
+}
+
+model ArticleType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  articles Article[]
+}
+
+model Article {
+  id            Int           @id @default(autoincrement())
+  title         String
+  status        ArticleStatus @default(BRIEF_PENDING)
+  deadline      DateTime?
+  googleDocLink String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  articleTypeId Int
+  articleType   ArticleType @relation(fields: [articleTypeId], references: [id])
+
+  // The admin who created the task
+  createdById Int
+  createdBy   User @relation("CreatedByAdmin", fields: [createdById], references: [id])
+
+  // The writer assigned to the task
+  assignedWriterId Int
+  assignedWriter   User @relation("AssignedWriter", fields: [assignedWriterId], references: [id])
+
+  activityLogs ActivityLog[]
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // The status before this change (null on first entry)
+  oldStatus ArticleStatus?
+  newStatus ArticleStatus
+  note      String?
+
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [id])
+
+  changedById Int
+  changedBy   User @relation(fields: [changedById], references: [id])
+}
