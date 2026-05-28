@@ -58,7 +58,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         deadline:         form.deadline || null,
         briefNotes:       form.briefNotes.trim() || null,
         wordCountTarget:  form.wordCountTarget  ? parseInt(form.wordCountTarget)  : null,
-        ttwTargetHours:   form.ttwTargetHours   ? parseInt(form.ttwTargetHours)   : null,
+        ttwTargetHours:   form.ttwTargetHours   ? parseFloat(form.ttwTargetHours)   : null,
       })
     } catch (err) {
       setError(err.message)
@@ -148,8 +148,9 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
                   id="af-ttw-target"
                   className="field-input"
                   type="number"
-                  min="1"
-                  placeholder="e.g. 24"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="e.g. 2.5"
                   {...field('ttwTargetHours')}
                 />
               </div>

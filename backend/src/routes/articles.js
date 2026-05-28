@@ -106,7 +106,7 @@ router.post(
           deadline:         deadline ? new Date(deadline) : null,
           briefNotes:       briefNotes || null,
           wordCountTarget:  wordCountTarget  ? parseInt(wordCountTarget)  : null,
-          ttwTargetHours:   ttwTargetHours   ? parseInt(ttwTargetHours)   : null,
+          ttwTargetHours:   ttwTargetHours   ? parseFloat(ttwTargetHours)   : null,
         },
         include: articleInclude,
       }),
