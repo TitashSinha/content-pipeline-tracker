@@ -17,24 +17,24 @@ export function isOverdue(article) {
   return new Date(article.deadline) < new Date()
 }
 
-// Computes time-to-write in whole hours from activity logs (any order).
+// Computes actual time taken in minutes from activity logs (any order).
 // Returns null if the article never entered WRITING or COMPLETED.
-export function computeTTWHours(activityLogs) {
+export function computeTTWMinutes(activityLogs) {
   const sorted = [...activityLogs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
   const writing   = sorted.find(l => l.newStatus === 'WRITING')
   const completed = sorted.find(l => l.newStatus === 'COMPLETED')
   if (!writing || !completed) return null
-  return Math.round((new Date(completed.createdAt) - new Date(writing.createdAt)) / 3_600_000)
+  return Math.round((new Date(completed.createdAt) - new Date(writing.createdAt)) / 60_000)
 }
 
-// Formats a TTW value (fractional hours) as a human-readable string.
-// e.g. 2.5 → "2h 30m", 0.5 → "30m", 25.0 → "1d 1h"
-export function formatTTW(hours) {
-  if (hours === null || hours === undefined) return '—'
-  const totalMins = Math.round(hours * 60)
-  if (totalMins < 60) return `${totalMins}m`
-  const days = Math.floor(totalMins / 1440)
-  const rem  = totalMins % 1440
+// Formats a TTW value (minutes) as a human-readable string.
+// e.g. 150 → "2h 30m", 30 → "30m", 1500 → "1d 1h"
+export function formatTTW(minutes) {
+  if (minutes === null || minutes === undefined) return '—'
+  const m = Math.round(minutes)
+  if (m < 60) return `${m}m`
+  const days = Math.floor(m / 1440)
+  const rem  = m % 1440
   const hrs  = Math.floor(rem / 60)
   const mins = rem % 60
   const hPart = hrs  > 0 ? `${hrs}h`  : ''

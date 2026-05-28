@@ -6,7 +6,7 @@ import Stepper from '../../components/Stepper'
 import TimelineEntry from '../../components/TimelineEntry'
 import ArticleForm from '../../components/admin/ArticleForm'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue, computeTTWHours, formatTTW } from '../../lib/utils'
+import { formatDate, isOverdue, computeTTWMinutes, formatTTW } from '../../lib/utils'
 import { STATUSES, STATUS_LABELS } from '../../lib/constants'
 
 export default function AdminArticlePage() {
@@ -84,7 +84,7 @@ export default function AdminArticlePage() {
   if (!article)  return <Layout><p className="state-msg">Article not found.</p></Layout>
 
   const overdue   = isOverdue(article)
-  const ttwHours  = computeTTWHours(article.activityLogs)
+  const ttwMins   = computeTTWMinutes(article.activityLogs)
 
   return (
     <Layout>
@@ -121,12 +121,12 @@ export default function AdminArticlePage() {
         )}
         <div className="detail-meta-item">
           <span className="detail-meta-label">TTW</span>
-          <span>{article.ttwTargetHours ? formatTTW(article.ttwTargetHours) : '—'}</span>
+          <span>{article.ttwTargetMinutes ? formatTTW(article.ttwTargetMinutes) : '—'}</span>
         </div>
         {ttwHours !== null && (
           <div className="detail-meta-item">
             <span className="detail-meta-label">Time Taken</span>
-            <span className="detail-ttw">{formatTTW(ttwHours)}</span>
+            <span className="detail-ttw">{formatTTW(ttwMins)}</span>
           </div>
         )}
         <div className="detail-meta-item">

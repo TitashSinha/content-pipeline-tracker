@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 const EMPTY = {
   title: '', clientId: '', articleTypeId: '', assignedWriterId: '',
-  deadline: '', briefNotes: '', wordCountTarget: '', ttwTargetHours: '',
+  deadline: '', briefNotes: '', wordCountTarget: '', ttwTargetMinutes: '',
 }
 
 export default function ArticleForm({ mode, article, writers, clients, articleTypes, onSave, onClose }) {
@@ -21,7 +21,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         deadline:         article.deadline ? article.deadline.slice(0, 10) : '',
         briefNotes:       article.briefNotes || '',
         wordCountTarget:  article.wordCountTarget  != null ? String(article.wordCountTarget)  : '',
-        ttwTargetHours:   article.ttwTargetHours   != null ? String(article.ttwTargetHours)   : '',
+        ttwTargetMinutes: article.ttwTargetMinutes != null ? String(article.ttwTargetMinutes) : '',
       })
     } else {
       setForm(EMPTY)
@@ -58,7 +58,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         deadline:         form.deadline || null,
         briefNotes:       form.briefNotes.trim() || null,
         wordCountTarget:  form.wordCountTarget  ? parseInt(form.wordCountTarget)  : null,
-        ttwTargetHours:   form.ttwTargetHours   ? parseFloat(form.ttwTargetHours)   : null,
+        ttwTargetMinutes: form.ttwTargetMinutes ? parseInt(form.ttwTargetMinutes)   : null,
       })
     } catch (err) {
       setError(err.message)
@@ -142,16 +142,16 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
 
               <div className="field">
                 <label className="field-label field-label--optional" htmlFor="af-ttw-target">
-                  Time to Write <span className="field-optional">(hours, optional)</span>
+                  Time to Write <span className="field-optional">(minutes, optional)</span>
                 </label>
                 <input
                   id="af-ttw-target"
                   className="field-input"
                   type="number"
-                  min="0.5"
-                  step="0.5"
-                  placeholder="e.g. 2.5"
-                  {...field('ttwTargetHours')}
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 150"
+                  {...field('ttwTargetMinutes')}
                 />
               </div>
             </div>

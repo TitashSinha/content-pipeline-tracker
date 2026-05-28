@@ -43,7 +43,7 @@ router.get(
       const writingLog   = activityLogs.find(l => l.newStatus === 'WRITING')
       const completedLog = activityLogs.find(l => l.newStatus === 'COMPLETED')
       const ttw = writingLog && completedLog
-        ? Math.round((new Date(completedLog.createdAt) - new Date(writingLog.createdAt)) / 3_600_000)
+        ? Math.round((new Date(completedLog.createdAt) - new Date(writingLog.createdAt)) / 60_000)
         : null
       return { ...article, ttw }
     })
@@ -87,7 +87,7 @@ router.post(
   '/',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetHours } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetMinutes } = req.body
 
     if (!title || !clientId || !articleTypeId || !assignedWriterId) {
       return res.status(400).json({
@@ -105,8 +105,8 @@ router.post(
           createdById:      req.user.id,
           deadline:         deadline ? new Date(deadline) : null,
           briefNotes:       briefNotes || null,
-          wordCountTarget:  wordCountTarget  ? parseInt(wordCountTarget)  : null,
-          ttwTargetHours:   ttwTargetHours   ? parseFloat(ttwTargetHours)   : null,
+          wordCountTarget:  wordCountTarget   ? parseInt(wordCountTarget)   : null,
+          ttwTargetMinutes: ttwTargetMinutes  ? parseInt(ttwTargetMinutes)  : null,
         },
         include: articleInclude,
       }),
@@ -133,7 +133,7 @@ router.put(
   requireAdmin,
   asyncHandler(async (req, res) => {
     const id = parseInt(req.params.id)
-    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetHours } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetMinutes } = req.body
 
     const exists = await prisma.article.findUnique({ where: { id } })
     if (!exists) return res.status(404).json({ error: 'Article not found' })
@@ -141,14 +141,14 @@ router.put(
     const article = await prisma.article.update({
       where: { id },
       data: {
-        ...(title            !== undefined && { title }),
-        ...(clientId         !== undefined && { clientId:         parseInt(clientId) }),
-        ...(articleTypeId    !== undefined && { articleTypeId:    parseInt(articleTypeId) }),
-        ...(assignedWriterId !== undefined && { assignedWriterId: parseInt(assignedWriterId) }),
-        ...(deadline         !== undefined && { deadline:         deadline ? new Date(deadline) : null }),
-        ...(briefNotes       !== undefined && { briefNotes:       briefNotes || null }),
-        ...(wordCountTarget  !== undefined && { wordCountTarget:  wordCountTarget  ? parseInt(wordCountTarget)  : null }),
-        ...(ttwTargetHours   !== undefined && { ttwTargetHours:   ttwTargetHours   ? parseInt(ttwTargetHours)   : null }),
+        ...(title             !== undefined && { title }),
+        ...(clientId          !== undefined && { clientId:          parseInt(clientId) }),
+        ...(articleTypeId     !== undefined && { articleTypeId:     parseInt(articleTypeId) }),
+        ...(assignedWriterId  !== undefined && { assignedWriterId:  parseInt(assignedWriterId) }),
+        ...(deadline          !== undefined && { deadline:          deadline ? new Date(deadline) : null }),
+        ...(briefNotes        !== undefined && { briefNotes:        briefNotes || null }),
+        ...(wordCountTarget   !== undefined && { wordCountTarget:   wordCountTarget  ? parseInt(wordCountTarget)   : null }),
+        ...(ttwTargetMinutes  !== undefined && { ttwTargetMinutes:  ttwTargetMinutes ? parseInt(ttwTargetMinutes)  : null }),
       },
       include: articleInclude,
     })

@@ -5,7 +5,7 @@ import StatusBadge from '../../components/StatusBadge'
 import Stepper from '../../components/Stepper'
 import TimelineEntry from '../../components/TimelineEntry'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue, computeTTWHours, formatTTW } from '../../lib/utils'
+import { formatDate, isOverdue, computeTTWMinutes, formatTTW } from '../../lib/utils'
 import { STATUSES } from '../../lib/constants'
 
 // Forward progression — null means already at the end
@@ -119,7 +119,7 @@ export default function WriterArticlePage() {
   const nextStatus = NEXT_STATUS[article.status]
   const prevStatus = PREV_STATUS[article.status]
   const showDoc    = article.status !== 'BRIEF_PENDING'
-  const ttwHours   = computeTTWHours(article.activityLogs)
+  const ttwMins    = computeTTWMinutes(article.activityLogs)
 
   return (
     <Layout>
@@ -156,12 +156,12 @@ export default function WriterArticlePage() {
         )}
         <div className="detail-meta-item">
           <span className="detail-meta-label">TTW</span>
-          <span>{article.ttwTargetHours ? formatTTW(article.ttwTargetHours) : '—'}</span>
+          <span>{article.ttwTargetMinutes ? formatTTW(article.ttwTargetMinutes) : '—'}</span>
         </div>
         {ttwHours !== null && (
           <div className="detail-meta-item">
             <span className="detail-meta-label">Time Taken</span>
-            <span className="detail-ttw">{formatTTW(ttwHours)}</span>
+            <span className="detail-ttw">{formatTTW(ttwMins)}</span>
           </div>
         )}
         <div className="detail-meta-item">
