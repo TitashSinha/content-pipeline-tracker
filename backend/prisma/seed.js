@@ -105,7 +105,7 @@ async function main() {
     create: { name: 'Titash Sinha', email: 'titash@lexiconn.in', password, role: 'WRITER' },
   })
 
-  console.log('✓ Users (password for all: password123)')
+  console.log('✓ Users')
 
   // ── Lookup IDs ─────────────────────────────────────────────────────────────
   const types   = await prisma.articleType.findMany()

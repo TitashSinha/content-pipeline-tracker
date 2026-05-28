@@ -4,31 +4,44 @@ import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
 import Stepper from '../../components/Stepper'
 import TimelineEntry from '../../components/TimelineEntry'
+import ArticleForm from '../../components/admin/ArticleForm'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue } from '../../lib/utils'
+import { formatDate, isOverdue, computeTTWHours, formatTTW } from '../../lib/utils'
 import { STATUSES, STATUS_LABELS } from '../../lib/constants'
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminArticlePage() {
   const { id } = useParams()
 
-  const [article,   setArticle]   = useState(null)
-  const [loading,   setLoading]   = useState(true)
-  const [pageError, setPageError] = useState('')
+  const [article,      setArticle]      = useState(null)
+  const [writers,      setWriters]      = useState([])
+  const [clients,      setClients]      = useState([])
+  const [articleTypes, setArticleTypes] = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [pageError,    setPageError]    = useState('')
 
   // Status update
-  const [newStatus,  setNewStatus]  = useState('')
-  const [note,       setNote]       = useState('')
-  const [saving,     setSaving]     = useState(false)
-  const [saveError,  setSaveError]  = useState('')
-  const [saveOk,     setSaveOk]     = useState(false)
+  const [newStatus, setNewStatus] = useState('')
+  const [note,      setNote]      = useState('')
+  const [saving,    setSaving]    = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [saveOk,    setSaveOk]    = useState(false)
 
-  async function loadArticle() {
+  // Edit modal
+  const [formModal, setFormModal] = useState(false)
+
+  async function loadAll() {
     try {
-      const data = await apiFetch(`/api/articles/${id}`)
+      const [data, wrs, cls, types] = await Promise.all([
+        apiFetch(`/api/articles/${id}`),
+        apiFetch('/api/users/writers'),
+        apiFetch('/api/clients'),
+        apiFetch('/api/article-types'),
+      ])
       setArticle(data)
       setNewStatus(data.status)
+      setWriters(wrs)
+      setClients(cls)
+      setArticleTypes(types)
     } catch (err) {
       setPageError(err.message)
     } finally {
@@ -36,7 +49,7 @@ export default function AdminArticlePage() {
     }
   }
 
-  useEffect(() => { loadArticle() }, [id])
+  useEffect(() => { loadAll() }, [id])
 
   async function handleStatusSave() {
     if (!newStatus || newStatus === article.status) return
@@ -50,7 +63,7 @@ export default function AdminArticlePage() {
       })
       setNote('')
       setSaveOk(true)
-      await loadArticle()
+      await loadAll()
     } catch (err) {
       setSaveError(err.message)
     } finally {
@@ -58,13 +71,20 @@ export default function AdminArticlePage() {
     }
   }
 
-  // ── Render states ──────────────────────────────────────────────────────────
+  async function handleEditSave(data) {
+    await apiFetch(`/api/articles/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+    setFormModal(false)
+    await loadAll()
+  }
+
+  // ── Render states ─────────────────────────────────────────────────────────────
 
   if (loading)   return <Layout><p className="state-msg">Loading…</p></Layout>
   if (pageError) return <Layout><p className="state-msg state-msg--error">{pageError}</p></Layout>
   if (!article)  return <Layout><p className="state-msg">Article not found.</p></Layout>
 
-  const overdue = isOverdue(article)
+  const overdue   = isOverdue(article)
+  const ttwHours  = computeTTWHours(article.activityLogs)
 
   return (
     <Layout>
@@ -93,6 +113,18 @@ export default function AdminArticlePage() {
           <span className="detail-meta-label">Deadline</span>
           <span className={overdue ? 'text-danger' : ''}>{formatDate(article.deadline)}</span>
         </div>
+        {article.wordCountTarget && (
+          <div className="detail-meta-item">
+            <span className="detail-meta-label">Word Count</span>
+            <span>{article.wordCountTarget.toLocaleString()} words</span>
+          </div>
+        )}
+        {ttwHours !== null && (
+          <div className="detail-meta-item">
+            <span className="detail-meta-label">TTW</span>
+            <span className="detail-ttw">{formatTTW(ttwHours)}</span>
+          </div>
+        )}
         <div className="detail-meta-item">
           <span className="detail-meta-label">Assigned to</span>
           <span>{article.assignedWriter.name}</span>
@@ -102,6 +134,21 @@ export default function AdminArticlePage() {
           <span>{article.createdBy.name}</span>
         </div>
       </div>
+
+      {/* Edit button */}
+      <div style={{ marginBottom: '16px' }}>
+        <button className="btn-secondary" onClick={() => setFormModal(true)}>
+          ✎ Edit Details
+        </button>
+      </div>
+
+      {/* Brief notes */}
+      {article.briefNotes && (
+        <div className="detail-section">
+          <h3 className="section-heading">Brief Notes</h3>
+          <p className="brief-notes">{article.briefNotes}</p>
+        </div>
+      )}
 
       {/* Progress stepper */}
       <div className="detail-section">
@@ -177,6 +224,19 @@ export default function AdminArticlePage() {
           </div>
         )}
       </div>
+
+      {/* Edit modal */}
+      {formModal && (
+        <ArticleForm
+          mode="edit"
+          article={article}
+          writers={writers}
+          clients={clients}
+          articleTypes={articleTypes}
+          onSave={handleEditSave}
+          onClose={() => setFormModal(false)}
+        />
+      )}
     </Layout>
   )
 }

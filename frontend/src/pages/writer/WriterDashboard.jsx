@@ -46,7 +46,14 @@ export default function WriterDashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  const active    = articles.filter((a) => a.status !== 'COMPLETED')
+  const active = articles
+    .filter((a) => a.status !== 'COMPLETED')
+    .sort((a, b) => {
+      if (!a.deadline && !b.deadline) return 0
+      if (!a.deadline) return 1
+      if (!b.deadline) return -1
+      return new Date(a.deadline) - new Date(b.deadline)
+    })
   const completed = articles.filter((a) => a.status === 'COMPLETED')
   const overdue   = articles.filter(isOverdue).length
 

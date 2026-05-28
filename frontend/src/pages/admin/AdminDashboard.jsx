@@ -1,17 +1,17 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
 import ArticleForm from '../../components/admin/ArticleForm'
 import ConfirmDialog from '../../components/admin/ConfirmDialog'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue } from '../../lib/utils'
+import { formatDate, isOverdue, formatTTW } from '../../lib/utils'
 import { STATUSES, STATUS_LABELS } from '../../lib/constants'
 
 const PAGE_SIZE = 20
 
 function exportToCSV(articles) {
-  const headers = ['Title', 'Client', 'Article Type', 'Assigned Writer', 'Status', 'Deadline', 'Google Doc Link']
+  const headers = ['Title', 'Client', 'Article Type', 'Assigned Writer', 'Status', 'Deadline', 'Word Count Target', 'TTW', 'Google Doc Link']
   const rows = articles.map(a => [
     a.title,
     a.client.name,
@@ -19,6 +19,8 @@ function exportToCSV(articles) {
     a.assignedWriter.name,
     a.status,
     formatDate(a.deadline),
+    a.wordCountTarget ?? '',
+    a.ttw != null ? formatTTW(a.ttw) : '',
     a.googleDocLink || '',
   ])
   const csv = [headers, ...rows]
@@ -102,7 +104,6 @@ function DashboardStats({ articles, dashStats }) {
 
   return (
     <div className="dashboard-stats">
-      {/* Top stat cards */}
       <div className="stat-cards">
         <StatCard label="Active" value={activeCount} />
         <StatCard label="Overdue" value={overdueCount} variant={overdueCount > 0 ? 'warning' : null} />
@@ -110,7 +111,6 @@ function DashboardStats({ articles, dashStats }) {
       </div>
 
       <div className="dashboard-lower">
-        {/* Status breakdown */}
         <div className="dash-panel">
           <h4 className="dash-panel-title">By Stage</h4>
           <div className="stage-breakdown">
@@ -123,7 +123,6 @@ function DashboardStats({ articles, dashStats }) {
           </div>
         </div>
 
-        {/* Writer workload */}
         <div className="dash-panel">
           <h4 className="dash-panel-title">Writer Workload</h4>
           {byWriter.length === 0 ? (
@@ -156,9 +155,23 @@ function DashboardStats({ articles, dashStats }) {
   )
 }
 
+// ─── Sortable column header ───────────────────────────────────────────────────
+
+function SortTh({ label, sortKeyVal, sortKey, sortDir, onSort, className }) {
+  const active = sortKey === sortKeyVal
+  const icon   = active ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ' ↕'
+  return (
+    <th className={`th-sortable${className ? ` ${className}` : ''}`} onClick={() => onSort(sortKeyVal)}>
+      {label}<span className="sort-icon">{icon}</span>
+    </th>
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard() {
+  const navigate = useNavigate()
+
   const [articles,     setArticles]     = useState([])
   const [writers,      setWriters]      = useState([])
   const [clients,      setClients]      = useState([])
@@ -167,7 +180,7 @@ export default function AdminDashboard() {
   const [loading,      setLoading]      = useState(true)
   const [error,        setError]        = useState('')
 
-  // Modal state — null means closed
+  // Modal state
   const [formModal,    setFormModal]    = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [confirming,   setConfirming]   = useState(false)
@@ -176,9 +189,14 @@ export default function AdminDashboard() {
   const [search,        setSearch]        = useState('')
   const [filterStatus,  setFilterStatus]  = useState('')
   const [filterWriter,  setFilterWriter]  = useState('')
+  const [filterClient,  setFilterClient]  = useState('')
   const [currentPage,   setCurrentPage]   = useState(1)
 
-  // ── Data loading ────────────────────────────────────────────────────────────
+  // Sort state
+  const [sortKey,  setSortKey]  = useState('createdAt')
+  const [sortDir,  setSortDir]  = useState('desc')
+
+  // ── Data loading ─────────────────────────────────────────────────────────────
 
   async function loadAll() {
     try {
@@ -203,24 +221,64 @@ export default function AdminDashboard() {
 
   useEffect(() => { loadAll() }, [])
 
-  // ── Filtered list (client-side) ─────────────────────────────────────────────
+  // ── Filtering ─────────────────────────────────────────────────────────────────
 
   const filtered = useMemo(() => {
-    setCurrentPage(1)
     return articles.filter(a => {
       if (search       && !a.title.toLowerCase().includes(search.toLowerCase())) return false
       if (filterStatus && a.status !== filterStatus)                              return false
       if (filterWriter && String(a.assignedWriter.id) !== filterWriter)           return false
+      if (filterClient && String(a.client.id)         !== filterClient)           return false
       return true
     })
-  }, [articles, search, filterStatus, filterWriter])
+  }, [articles, search, filterStatus, filterWriter, filterClient])
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
-  const paginated  = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  // Reset to page 1 whenever the filtered set changes
+  useEffect(() => { setCurrentPage(1) }, [filtered])
+
+  // ── Sorting ───────────────────────────────────────────────────────────────────
+
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      let av, bv
+      switch (sortKey) {
+        case 'deadline':
+          av = a.deadline ? new Date(a.deadline).getTime() : Infinity
+          bv = b.deadline ? new Date(b.deadline).getTime() : Infinity
+          break
+        case 'status':
+          av = STATUSES.indexOf(a.status)
+          bv = STATUSES.indexOf(b.status)
+          break
+        case 'writer':
+          av = a.assignedWriter.name.toLowerCase()
+          bv = b.assignedWriter.name.toLowerCase()
+          break
+        case 'client':
+          av = a.client.name.toLowerCase()
+          bv = b.client.name.toLowerCase()
+          break
+        default:
+          av = new Date(a.createdAt).getTime()
+          bv = new Date(b.createdAt).getTime()
+      }
+      if (av < bv) return sortDir === 'asc' ? -1 : 1
+      if (av > bv) return sortDir === 'asc' ?  1 : -1
+      return 0
+    })
+  }, [filtered, sortKey, sortDir])
+
+  function toggleSort(key) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(key); setSortDir('asc') }
+  }
+
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE)
+  const paginated  = sorted.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   const overdueCount = useMemo(() => articles.filter(isOverdue).length, [articles])
 
-  // ── CRUD handlers ───────────────────────────────────────────────────────────
+  // ── CRUD handlers ─────────────────────────────────────────────────────────────
 
   async function handleSave(data) {
     if (formModal.mode === 'create') {
@@ -247,11 +305,12 @@ export default function AdminDashboard() {
     setSearch('')
     setFilterStatus('')
     setFilterWriter('')
+    setFilterClient('')
   }
 
-  const hasFilters = search || filterStatus || filterWriter
+  const hasFilters = search || filterStatus || filterWriter || filterClient
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────────
 
   return (
     <Layout>
@@ -270,8 +329,8 @@ export default function AdminDashboard() {
           </button>
           <button
             className="btn-secondary"
-            onClick={() => exportToCSV(filtered)}
-            disabled={filtered.length === 0}
+            onClick={() => exportToCSV(sorted)}
+            disabled={sorted.length === 0}
             title="Export current view as CSV"
           >
             ↓ Export CSV
@@ -314,6 +373,14 @@ export default function AdminDashboard() {
           <option value="">All writers</option>
           {writers.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
         </select>
+        <select
+          className="field-input filter-select"
+          value={filterClient}
+          onChange={(e) => setFilterClient(e.target.value)}
+        >
+          <option value="">All clients</option>
+          {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
         {hasFilters && (
           <button className="btn-clear" onClick={clearFilters}>Clear</button>
         )}
@@ -324,7 +391,7 @@ export default function AdminDashboard() {
         <p className="state-msg">Loading…</p>
       ) : error ? (
         <p className="state-msg state-msg--error">{error}</p>
-      ) : filtered.length === 0 ? (
+      ) : sorted.length === 0 ? (
         <p className="state-msg">
           {hasFilters ? 'No articles match your filters.' : 'No articles yet. Create one to get started.'}
         </p>
@@ -333,12 +400,14 @@ export default function AdminDashboard() {
           <table className="article-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Writer</th>
-                <th>Client</th>
+                <SortTh label="Title"   sortKeyVal="title"     sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+                <SortTh label="Writer"  sortKeyVal="writer"    sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+                <SortTh label="Client"  sortKeyVal="client"    sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
                 <th>Type</th>
-                <th>Deadline</th>
-                <th>Status</th>
+                <SortTh label="Deadline" sortKeyVal="deadline" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+                <SortTh label="Status"   sortKeyVal="status"   sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+                <th>Doc</th>
+                <th>TTW</th>
                 <th><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
@@ -346,12 +415,14 @@ export default function AdminDashboard() {
               {paginated.map((a) => {
                 const overdue = isOverdue(a)
                 return (
-                  <tr key={a.id} className={overdue ? 'row--overdue' : ''}>
+                  <tr
+                    key={a.id}
+                    className={`row--clickable${overdue ? ' row--overdue' : ''}`}
+                    onClick={() => navigate(`/admin/articles/${a.id}`)}
+                  >
                     <td data-label="Title">
                       <div className="td-title">
-                        <Link className="article-title-link" to={`/admin/articles/${a.id}`}>
-                          {a.title}
-                        </Link>
+                        <span className="article-title-link">{a.title}</span>
                         {overdue && <span className="overdue-tag">Overdue</span>}
                       </div>
                     </td>
@@ -362,16 +433,25 @@ export default function AdminDashboard() {
                       {formatDate(a.deadline)}
                     </td>
                     <td data-label="Status"><StatusBadge status={a.status} /></td>
+                    <td data-label="Doc">
+                      {a.googleDocLink
+                        ? <a href={a.googleDocLink} target="_blank" rel="noreferrer" className="doc-indicator" onClick={e => e.stopPropagation()}>↗ Doc</a>
+                        : <span className="doc-indicator--none">—</span>
+                      }
+                    </td>
+                    <td data-label="TTW" className="td-ttw">
+                      {a.ttw != null ? formatTTW(a.ttw) : '—'}
+                    </td>
                     <td className="td-actions">
                       <button
                         className="btn-action"
-                        onClick={() => setFormModal({ mode: 'edit', article: a })}
+                        onClick={e => { e.stopPropagation(); setFormModal({ mode: 'edit', article: a }) }}
                       >
                         Edit
                       </button>
                       <button
                         className="btn-action btn-action--danger"
-                        onClick={() => setDeleteTarget(a)}
+                        onClick={e => { e.stopPropagation(); setDeleteTarget(a) }}
                       >
                         Delete
                       </button>
@@ -381,27 +461,27 @@ export default function AdminDashboard() {
               })}
             </tbody>
           </table>
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              className="btn-secondary pagination-btn"
-              onClick={() => setCurrentPage(p => p - 1)}
-              disabled={currentPage === 1}
-            >
-              ← Prev
-            </button>
-            <span className="pagination-info">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              className="btn-secondary pagination-btn"
-              onClick={() => setCurrentPage(p => p + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next →
-            </button>
-          </div>
-        )}
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button
+                className="btn-secondary pagination-btn"
+                onClick={() => setCurrentPage(p => p - 1)}
+                disabled={currentPage === 1}
+              >
+                ← Prev
+              </button>
+              <span className="pagination-info">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                className="btn-secondary pagination-btn"
+                onClick={() => setCurrentPage(p => p + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       )}
 

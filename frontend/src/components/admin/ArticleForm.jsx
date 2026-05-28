@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 
-const EMPTY = { title: '', clientId: '', articleTypeId: '', assignedWriterId: '', deadline: '' }
+const EMPTY = {
+  title: '', clientId: '', articleTypeId: '', assignedWriterId: '',
+  deadline: '', briefNotes: '', wordCountTarget: '',
+}
 
 export default function ArticleForm({ mode, article, writers, clients, articleTypes, onSave, onClose }) {
-  const [form, setForm] = useState(EMPTY)
+  const [form,   setForm]   = useState(EMPTY)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
+  const [error,  setError]  = useState('')
 
   // Pre-populate when editing
   useEffect(() => {
@@ -16,6 +19,8 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         articleTypeId:    String(article.articleTypeId),
         assignedWriterId: String(article.assignedWriterId),
         deadline:         article.deadline ? article.deadline.slice(0, 10) : '',
+        briefNotes:       article.briefNotes || '',
+        wordCountTarget:  article.wordCountTarget != null ? String(article.wordCountTarget) : '',
       })
     } else {
       setForm(EMPTY)
@@ -50,6 +55,8 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         articleTypeId:    parseInt(form.articleTypeId),
         assignedWriterId: parseInt(form.assignedWriterId),
         deadline:         form.deadline || null,
+        briefNotes:       form.briefNotes.trim() || null,
+        wordCountTarget:  form.wordCountTarget ? parseInt(form.wordCountTarget) : null,
       })
     } catch (err) {
       setError(err.message)
@@ -114,6 +121,35 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
                 <label className="field-label" htmlFor="af-deadline">Deadline</label>
                 <input id="af-deadline" className="field-input" type="date" {...field('deadline')} />
               </div>
+            </div>
+
+            <div className="form-row">
+              <div className="field">
+                <label className="field-label field-label--optional" htmlFor="af-word-count">
+                  Word Count Target <span className="field-optional">(optional)</span>
+                </label>
+                <input
+                  id="af-word-count"
+                  className="field-input"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 1000"
+                  {...field('wordCountTarget')}
+                />
+              </div>
+            </div>
+
+            <div className="field">
+              <label className="field-label field-label--optional" htmlFor="af-brief-notes">
+                Brief Notes <span className="field-optional">(optional)</span>
+              </label>
+              <textarea
+                id="af-brief-notes"
+                className="field-input field-textarea"
+                rows={4}
+                placeholder="Context, instructions, or key points for the writer…"
+                {...field('briefNotes')}
+              />
             </div>
           </div>
 

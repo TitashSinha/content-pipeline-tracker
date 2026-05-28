@@ -29,11 +29,14 @@ router.get(
         },
       }),
 
-      // Completed within the current calendar month
+      // Completed within the current calendar month — use the ActivityLog so
+      // edits to metadata don't reset the count the way updatedAt would
       prisma.article.count({
         where: {
           status: 'COMPLETED',
-          updatedAt: { gte: startOfMonth },
+          activityLogs: {
+            some: { newStatus: 'COMPLETED', createdAt: { gte: startOfMonth } },
+          },
         },
       }),
 

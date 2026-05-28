@@ -5,10 +5,8 @@ import StatusBadge from '../../components/StatusBadge'
 import Stepper from '../../components/Stepper'
 import TimelineEntry from '../../components/TimelineEntry'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue } from '../../lib/utils'
+import { formatDate, isOverdue, computeTTWHours, formatTTW } from '../../lib/utils'
 import { STATUSES } from '../../lib/constants'
-
-// ─── Constants ────────────────────────────────────────────────────────────────
 
 // Forward progression — null means already at the end
 const NEXT_STATUS = {
@@ -42,25 +40,23 @@ const BACK_LABEL = {
   COMPLETED: '← Back to Revision',
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function WriterArticlePage() {
   const { id } = useParams()
 
-  const [article,    setArticle]    = useState(null)
-  const [loading,    setLoading]    = useState(true)
-  const [pageError,  setPageError]  = useState('')
+  const [article,   setArticle]   = useState(null)
+  const [loading,   setLoading]   = useState(true)
+  const [pageError, setPageError] = useState('')
 
   // Status update
-  const [note,       setNote]       = useState('')
-  const [saving,     setSaving]     = useState(false)
-  const [saveError,  setSaveError]  = useState('')
+  const [note,      setNote]      = useState('')
+  const [saving,    setSaving]    = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   // Google Doc link
-  const [docLink,    setDocLink]    = useState('')
-  const [savingDoc,  setSavingDoc]  = useState(false)
-  const [docError,   setDocError]   = useState('')
-  const [docSaved,   setDocSaved]   = useState(false)
+  const [docLink,   setDocLink]   = useState('')
+  const [savingDoc, setSavingDoc] = useState(false)
+  const [docError,  setDocError]  = useState('')
+  const [docSaved,  setDocSaved]  = useState(false)
 
   async function loadArticle() {
     try {
@@ -113,7 +109,7 @@ export default function WriterArticlePage() {
     }
   }
 
-  // ── Render states ──────────────────────────────────────────────────────────
+  // ── Render states ─────────────────────────────────────────────────────────────
 
   if (loading)   return <Layout><p className="state-msg">Loading article…</p></Layout>
   if (pageError) return <Layout><p className="state-msg state-msg--error">{pageError}</p></Layout>
@@ -123,10 +119,10 @@ export default function WriterArticlePage() {
   const nextStatus = NEXT_STATUS[article.status]
   const prevStatus = PREV_STATUS[article.status]
   const showDoc    = article.status !== 'BRIEF_PENDING'
+  const ttwHours   = computeTTWHours(article.activityLogs)
 
   return (
     <Layout>
-      {/* Back navigation */}
       <Link to="/writer" className="back-link">← My Content</Link>
 
       {/* Article header */}
@@ -152,11 +148,31 @@ export default function WriterArticlePage() {
           <span className="detail-meta-label">Deadline</span>
           <span className={overdue ? 'text-danger' : ''}>{formatDate(article.deadline)}</span>
         </div>
+        {article.wordCountTarget && (
+          <div className="detail-meta-item">
+            <span className="detail-meta-label">Word Count</span>
+            <span>{article.wordCountTarget.toLocaleString()} words</span>
+          </div>
+        )}
+        {ttwHours !== null && (
+          <div className="detail-meta-item">
+            <span className="detail-meta-label">TTW</span>
+            <span className="detail-ttw">{formatTTW(ttwHours)}</span>
+          </div>
+        )}
         <div className="detail-meta-item">
           <span className="detail-meta-label">Assigned by</span>
           <span>{article.createdBy.name}</span>
         </div>
       </div>
+
+      {/* Brief notes — visible to writer, read-only */}
+      {article.briefNotes && (
+        <div className="detail-section">
+          <h3 className="section-heading">Brief Notes</h3>
+          <p className="brief-notes">{article.briefNotes}</p>
+        </div>
+      )}
 
       {/* Progress stepper */}
       <div className="detail-section">
@@ -164,7 +180,7 @@ export default function WriterArticlePage() {
         <Stepper currentStatus={article.status} />
       </div>
 
-      {/* Status actions — shown whenever there is at least one direction to move */}
+      {/* Status actions */}
       {(nextStatus || prevStatus) && (
         <div className="detail-section">
           <h3 className="section-heading">Update Status</h3>
@@ -173,7 +189,6 @@ export default function WriterArticlePage() {
             <p className="completed-msg" style={{ marginBottom: '16px' }}>✓ This article is marked complete</p>
           )}
 
-          {/* Buttons first — the note is secondary */}
           <div className="status-btn-row">
             {prevStatus && (
               <button
@@ -195,7 +210,6 @@ export default function WriterArticlePage() {
             )}
           </div>
 
-          {/* Note — clearly secondary, after the action buttons */}
           <div className="field" style={{ marginTop: '16px' }}>
             <label className="field-label field-label--optional" htmlFor="status-note">
               Add a note <span className="field-optional">(optional)</span>

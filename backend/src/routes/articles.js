@@ -20,6 +20,7 @@ const VALID_STATUSES = ['BRIEF_PENDING', 'WRITING', 'REVIEW', 'REVISION', 'COMPL
 
 // ─── GET /api/articles ────────────────────────────────────────────────────────
 // Admin → all articles. Writer → only their assigned articles.
+// Includes a computed `ttw` field (hours from first WRITING → first COMPLETED).
 router.get(
   '/',
   asyncHandler(async (req, res) => {
@@ -27,11 +28,27 @@ router.get(
 
     const articles = await prisma.article.findMany({
       where,
-      include: articleInclude,
+      include: {
+        ...articleInclude,
+        activityLogs: {
+          where: { newStatus: { in: ['WRITING', 'COMPLETED'] } },
+          orderBy: { createdAt: 'asc' },
+          select: { newStatus: true, createdAt: true },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     })
 
-    res.json(articles)
+    const result = articles.map(({ activityLogs, ...article }) => {
+      const writingLog   = activityLogs.find(l => l.newStatus === 'WRITING')
+      const completedLog = activityLogs.find(l => l.newStatus === 'COMPLETED')
+      const ttw = writingLog && completedLog
+        ? Math.round((new Date(completedLog.createdAt) - new Date(writingLog.createdAt)) / 3_600_000)
+        : null
+      return { ...article, ttw }
+    })
+
+    res.json(result)
   })
 )
 
@@ -70,7 +87,7 @@ router.post(
   '/',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const { title, clientId, articleTypeId, assignedWriterId, deadline } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget } = req.body
 
     if (!title || !clientId || !articleTypeId || !assignedWriterId) {
       return res.status(400).json({
@@ -78,16 +95,17 @@ router.post(
       })
     }
 
-    // Run creation + initial activity log in a single transaction
     const [article] = await prisma.$transaction([
       prisma.article.create({
         data: {
           title,
-          clientId: parseInt(clientId),
-          articleTypeId: parseInt(articleTypeId),
+          clientId:         parseInt(clientId),
+          articleTypeId:    parseInt(articleTypeId),
           assignedWriterId: parseInt(assignedWriterId),
-          createdById: req.user.id,
-          deadline: deadline ? new Date(deadline) : null,
+          createdById:      req.user.id,
+          deadline:         deadline ? new Date(deadline) : null,
+          briefNotes:       briefNotes || null,
+          wordCountTarget:  wordCountTarget ? parseInt(wordCountTarget) : null,
         },
         include: articleInclude,
       }),
@@ -95,11 +113,11 @@ router.post(
 
     await prisma.activityLog.create({
       data: {
-        articleId: article.id,
+        articleId:   article.id,
         changedById: req.user.id,
-        oldStatus: null,
-        newStatus: 'BRIEF_PENDING',
-        note: 'Article created',
+        oldStatus:   null,
+        newStatus:   'BRIEF_PENDING',
+        note:        'Article created',
       },
     })
 
@@ -114,7 +132,7 @@ router.put(
   requireAdmin,
   asyncHandler(async (req, res) => {
     const id = parseInt(req.params.id)
-    const { title, clientId, articleTypeId, assignedWriterId, deadline } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget } = req.body
 
     const exists = await prisma.article.findUnique({ where: { id } })
     if (!exists) return res.status(404).json({ error: 'Article not found' })
@@ -122,11 +140,13 @@ router.put(
     const article = await prisma.article.update({
       where: { id },
       data: {
-        ...(title !== undefined && { title }),
-        ...(clientId !== undefined && { clientId: parseInt(clientId) }),
-        ...(articleTypeId !== undefined && { articleTypeId: parseInt(articleTypeId) }),
+        ...(title            !== undefined && { title }),
+        ...(clientId         !== undefined && { clientId:         parseInt(clientId) }),
+        ...(articleTypeId    !== undefined && { articleTypeId:    parseInt(articleTypeId) }),
         ...(assignedWriterId !== undefined && { assignedWriterId: parseInt(assignedWriterId) }),
-        ...(deadline !== undefined && { deadline: deadline ? new Date(deadline) : null }),
+        ...(deadline         !== undefined && { deadline:         deadline ? new Date(deadline) : null }),
+        ...(briefNotes       !== undefined && { briefNotes:       briefNotes || null }),
+        ...(wordCountTarget  !== undefined && { wordCountTarget:  wordCountTarget ? parseInt(wordCountTarget) : null }),
       },
       include: articleInclude,
     })
@@ -173,12 +193,10 @@ router.patch(
     const article = await prisma.article.findUnique({ where: { id } })
     if (!article) return res.status(404).json({ error: 'Article not found' })
 
-    // Writers can only update articles assigned to them
     if (req.user.role === 'WRITER' && article.assignedWriterId !== req.user.id) {
       return res.status(403).json({ error: 'Access denied' })
     }
 
-    // Update status and create the log in one atomic transaction
     const [updatedArticle] = await prisma.$transaction([
       prisma.article.update({
         where: { id },
@@ -187,11 +205,11 @@ router.patch(
       }),
       prisma.activityLog.create({
         data: {
-          articleId: id,
+          articleId:   id,
           changedById: req.user.id,
-          oldStatus: article.status,
-          newStatus: status,
-          note: note ?? null,
+          oldStatus:   article.status,
+          newStatus:   status,
+          note:        note ?? null,
         },
       }),
     ])
@@ -201,7 +219,7 @@ router.patch(
 )
 
 // ─── PATCH /api/articles/:id/doc ─────────────────────────────────────────────
-// Writer only. Submits (or updates) the final Google Doc link.
+// Writer only. Submits (or updates) the Google Doc link.
 router.patch(
   '/:id/doc',
   requireWriter,
@@ -211,6 +229,10 @@ router.patch(
 
     if (!googleDocLink) {
       return res.status(400).json({ error: 'googleDocLink is required' })
+    }
+
+    if (!googleDocLink.startsWith('https://docs.google.com/')) {
+      return res.status(400).json({ error: 'googleDocLink must be a Google Docs URL (https://docs.google.com/…)' })
     }
 
     const article = await prisma.article.findUnique({ where: { id } })

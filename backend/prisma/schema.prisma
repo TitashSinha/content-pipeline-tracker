@@ -55,13 +55,16 @@ model ArticleType {
 }
 
 model Article {
-  id            Int           @id @default(autoincrement())
-  title         String
-  status        ArticleStatus @default(BRIEF_PENDING)
-  deadline      DateTime?
-  googleDocLink String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              Int           @id @default(autoincrement())
+  title           String
+  status          ArticleStatus @default(BRIEF_PENDING)
+  deadline        DateTime?
+  googleDocLink   String?
+  briefNotes      String?
+  wordCountTarget Int?
+  reminderSentAt  DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   clientId Int
   client   Client @relation(fields: [clientId], references: [id])

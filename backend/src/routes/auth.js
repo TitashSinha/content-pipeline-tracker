@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma.js'
 import asyncHandler from '../lib/asyncHandler.js'
+import { authenticate } from '../middleware/auth.js'
 
 const router = Router()
 
@@ -45,19 +46,8 @@ router.post(
 // Requires valid JWT (any role)
 router.patch(
   '/password',
+  authenticate,
   asyncHandler(async (req, res) => {
-    const header = req.headers.authorization
-    if (!header?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Authentication required' })
-    }
-
-    let payload
-    try {
-      payload = jwt.verify(header.split(' ')[1], process.env.JWT_SECRET)
-    } catch {
-      return res.status(401).json({ error: 'Invalid or expired token' })
-    }
-
     const { currentPassword, newPassword } = req.body
 
     if (!currentPassword || !newPassword) {
@@ -68,7 +58,7 @@ router.patch(
       return res.status(400).json({ error: 'New password must be at least 8 characters' })
     }
 
-    const user = await prisma.user.findUnique({ where: { id: payload.id } })
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } })
     if (!user) return res.status(404).json({ error: 'User not found' })
 
     const valid = await bcrypt.compare(currentPassword, user.password)

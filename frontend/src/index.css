@@ -1305,6 +1305,41 @@ body { min-height: 100vh; }
   .td-title { flex-direction: row; gap: 8px; flex-wrap: wrap; }
 }
 
+/* ─── Clickable table rows ───────────────────────────────────────────────────── */
+.row--clickable { cursor: pointer; }
+.row--clickable:hover .article-title-link { color: var(--color-admin); text-decoration: underline; }
+
+/* ─── Sortable column headers ────────────────────────────────────────────────── */
+.th-sortable { cursor: pointer; user-select: none; }
+.th-sortable:hover { background: #eef2f7; color: var(--color-text); }
+
+.sort-icon {
+  display: inline-block;
+  font-size: 0.6rem;
+  color: var(--color-muted);
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+/* ─── Google Doc indicator (table cell) ──────────────────────────────────────── */
+.doc-indicator { color: var(--color-admin); font-size: 0.8rem; text-decoration: none; font-weight: 500; }
+.doc-indicator:hover { text-decoration: underline; }
+.doc-indicator--none { color: var(--color-muted); font-size: 0.8rem; }
+
+/* ─── TTW table cell ─────────────────────────────────────────────────────────── */
+.td-ttw { white-space: nowrap; font-size: 0.85rem; color: var(--color-muted); }
+
+/* ─── TTW / word count in meta strip ────────────────────────────────────────── */
+.detail-ttw { font-weight: 600; color: #15803d; }
+
+/* ─── Brief notes block ──────────────────────────────────────────────────────── */
+.brief-notes {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
 /* ─── Change password page ──────────────────────────────────────────────────── */
 .change-password-wrap {
   max-width: 440px;
