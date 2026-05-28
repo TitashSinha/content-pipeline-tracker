@@ -62,6 +62,7 @@ model Article {
   googleDocLink   String?
   briefNotes      String?
   wordCountTarget Int?
+  ttwTargetHours  Int?
   reminderSentAt  DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 const EMPTY = {
   title: '', clientId: '', articleTypeId: '', assignedWriterId: '',
-  deadline: '', briefNotes: '', wordCountTarget: '',
+  deadline: '', briefNotes: '', wordCountTarget: '', ttwTargetHours: '',
 }
 
 export default function ArticleForm({ mode, article, writers, clients, articleTypes, onSave, onClose }) {
@@ -20,7 +20,8 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         assignedWriterId: String(article.assignedWriterId),
         deadline:         article.deadline ? article.deadline.slice(0, 10) : '',
         briefNotes:       article.briefNotes || '',
-        wordCountTarget:  article.wordCountTarget != null ? String(article.wordCountTarget) : '',
+        wordCountTarget:  article.wordCountTarget  != null ? String(article.wordCountTarget)  : '',
+        ttwTargetHours:   article.ttwTargetHours   != null ? String(article.ttwTargetHours)   : '',
       })
     } else {
       setForm(EMPTY)
@@ -56,7 +57,8 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
         assignedWriterId: parseInt(form.assignedWriterId),
         deadline:         form.deadline || null,
         briefNotes:       form.briefNotes.trim() || null,
-        wordCountTarget:  form.wordCountTarget ? parseInt(form.wordCountTarget) : null,
+        wordCountTarget:  form.wordCountTarget  ? parseInt(form.wordCountTarget)  : null,
+        ttwTargetHours:   form.ttwTargetHours   ? parseInt(form.ttwTargetHours)   : null,
       })
     } catch (err) {
       setError(err.message)
@@ -135,6 +137,20 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
                   min="1"
                   placeholder="e.g. 1000"
                   {...field('wordCountTarget')}
+                />
+              </div>
+
+              <div className="field">
+                <label className="field-label field-label--optional" htmlFor="af-ttw-target">
+                  Time to Write <span className="field-optional">(hours, optional)</span>
+                </label>
+                <input
+                  id="af-ttw-target"
+                  className="field-input"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 24"
+                  {...field('ttwTargetHours')}
                 />
               </div>
             </div>

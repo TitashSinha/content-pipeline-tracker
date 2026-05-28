@@ -127,10 +127,18 @@ body { min-height: 100vh; }
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  box-shadow: 0 1px 3px rgba(37,99,235,.25);
 }
-.btn-primary:hover:not(:disabled) { opacity: 0.88; }
-.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37,99,235,.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 1px 3px rgba(37,99,235,.2);
+}
 .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 .btn-full { width: 100%; }
 
@@ -457,10 +465,11 @@ body { min-height: 100vh; }
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
   margin-left: 6px;
 }
-.btn-action:hover { background: #f1f5f9; }
+.btn-action:hover { background: #f1f5f9; border-color: #cbd5e1; transform: translateY(-1px); }
+.btn-action:active { transform: translateY(0); }
 .btn-action--danger { color: var(--color-danger); }
 .btn-action--danger:hover { background: var(--color-danger-bg); border-color: #fecaca; }
 
@@ -477,9 +486,14 @@ body { min-height: 100vh; }
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
-.btn-secondary:hover:not(:disabled) { background: #f1f5f9; }
+.btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+.btn-secondary:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 .btn-secondary:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .btn-danger {
@@ -494,9 +508,14 @@ body { min-height: 100vh; }
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
 }
-.btn-danger:hover:not(:disabled) { opacity: 0.88; }
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220,38,38,.3);
+  transform: translateY(-1px);
+}
+.btn-danger:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 .btn-danger:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ─── State messages ─────────────────────────────────────────────────────────── */
@@ -1195,9 +1214,14 @@ body { min-height: 100vh; }
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
 }
-.btn-go-back:hover:not(:disabled) { background: #fef3c7; }
+.btn-go-back:hover:not(:disabled) {
+  background: #fef3c7;
+  border-color: #b45309;
+  transform: translateY(-1px);
+}
+.btn-go-back:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 .btn-go-back:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .field-label--optional { display: flex; align-items: baseline; gap: 6px; }

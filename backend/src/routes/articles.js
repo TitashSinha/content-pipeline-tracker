@@ -87,7 +87,7 @@ router.post(
   '/',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetHours } = req.body
 
     if (!title || !clientId || !articleTypeId || !assignedWriterId) {
       return res.status(400).json({
@@ -105,7 +105,8 @@ router.post(
           createdById:      req.user.id,
           deadline:         deadline ? new Date(deadline) : null,
           briefNotes:       briefNotes || null,
-          wordCountTarget:  wordCountTarget ? parseInt(wordCountTarget) : null,
+          wordCountTarget:  wordCountTarget  ? parseInt(wordCountTarget)  : null,
+          ttwTargetHours:   ttwTargetHours   ? parseInt(ttwTargetHours)   : null,
         },
         include: articleInclude,
       }),
@@ -132,7 +133,7 @@ router.put(
   requireAdmin,
   asyncHandler(async (req, res) => {
     const id = parseInt(req.params.id)
-    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget } = req.body
+    const { title, clientId, articleTypeId, assignedWriterId, deadline, briefNotes, wordCountTarget, ttwTargetHours } = req.body
 
     const exists = await prisma.article.findUnique({ where: { id } })
     if (!exists) return res.status(404).json({ error: 'Article not found' })
@@ -146,7 +147,8 @@ router.put(
         ...(assignedWriterId !== undefined && { assignedWriterId: parseInt(assignedWriterId) }),
         ...(deadline         !== undefined && { deadline:         deadline ? new Date(deadline) : null }),
         ...(briefNotes       !== undefined && { briefNotes:       briefNotes || null }),
-        ...(wordCountTarget  !== undefined && { wordCountTarget:  wordCountTarget ? parseInt(wordCountTarget) : null }),
+        ...(wordCountTarget  !== undefined && { wordCountTarget:  wordCountTarget  ? parseInt(wordCountTarget)  : null }),
+        ...(ttwTargetHours   !== undefined && { ttwTargetHours:   ttwTargetHours   ? parseInt(ttwTargetHours)   : null }),
       },
       include: articleInclude,
     })

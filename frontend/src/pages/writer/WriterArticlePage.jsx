@@ -154,9 +154,15 @@ export default function WriterArticlePage() {
             <span>{article.wordCountTarget.toLocaleString()} words</span>
           </div>
         )}
+        {article.ttwTargetHours && (
+          <div className="detail-meta-item">
+            <span className="detail-meta-label">TTW Target</span>
+            <span>{formatTTW(article.ttwTargetHours)}</span>
+          </div>
+        )}
         {ttwHours !== null && (
           <div className="detail-meta-item">
-            <span className="detail-meta-label">TTW</span>
+            <span className="detail-meta-label">TTW Actual</span>
             <span className="detail-ttw">{formatTTW(ttwHours)}</span>
           </div>
         )}
