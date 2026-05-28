@@ -119,12 +119,10 @@ export default function AdminArticlePage() {
             <span>{article.wordCountTarget.toLocaleString()} words</span>
           </div>
         )}
-        {article.ttwTargetHours && (
-          <div className="detail-meta-item">
-            <span className="detail-meta-label">TTW</span>
-            <span>{formatTTW(article.ttwTargetHours)}</span>
-          </div>
-        )}
+        <div className="detail-meta-item">
+          <span className="detail-meta-label">TTW</span>
+          <span>{article.ttwTargetHours ? formatTTW(article.ttwTargetHours) : '—'}</span>
+        </div>
         {ttwHours !== null && (
           <div className="detail-meta-item">
             <span className="detail-meta-label">Time Taken</span>
