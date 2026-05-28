@@ -150,7 +150,7 @@ export default function ArticleForm({ mode, article, writers, clients, articleTy
                   type="number"
                   min="1"
                   step="1"
-                  placeholder="Enter time in minutes"
+                  placeholder="Enter Time in Minutes"
                   {...field('ttwTargetMinutes')}
                 />
               </div>
