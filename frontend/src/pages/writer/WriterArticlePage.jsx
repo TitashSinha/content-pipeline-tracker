@@ -156,13 +156,13 @@ export default function WriterArticlePage() {
         )}
         {article.ttwTargetHours && (
           <div className="detail-meta-item">
-            <span className="detail-meta-label">TTW Target</span>
+            <span className="detail-meta-label">Est. Time</span>
             <span>{formatTTW(article.ttwTargetHours)}</span>
           </div>
         )}
         {ttwHours !== null && (
           <div className="detail-meta-item">
-            <span className="detail-meta-label">TTW Actual</span>
+            <span className="detail-meta-label">Time Taken</span>
             <span className="detail-ttw">{formatTTW(ttwHours)}</span>
           </div>
         )}
