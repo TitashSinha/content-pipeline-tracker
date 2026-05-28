@@ -440,7 +440,14 @@ export default function AdminDashboard() {
                       }
                     </td>
                     <td data-label="TTW" className="td-ttw">
-                      {a.ttw != null ? formatTTW(a.ttw) : '—'}
+                      {a.ttw != null
+                        ? (a.ttwTargetMinutes
+                            ? <span title="Actual / Target">{formatTTW(a.ttw)} / {formatTTW(a.ttwTargetMinutes)}</span>
+                            : formatTTW(a.ttw))
+                        : (a.ttwTargetMinutes
+                            ? <span className="ttw-target" title="Target">{formatTTW(a.ttwTargetMinutes)}</span>
+                            : '—')
+                      }
                     </td>
                     <td className="td-actions">
                       <button

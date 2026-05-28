@@ -127,6 +127,8 @@ async function main() {
       assignedWriterId: nandakumar.id,
       createdById:      admin.id,
       deadline:         days(5),
+      wordCountTarget:  1200,
+      ttwTargetMinutes: 90,
     },
     {
       title:            'Homepage Refresh — Hero and Feature Sections',
@@ -136,6 +138,8 @@ async function main() {
       assignedWriterId: abhijeet.id,
       createdById:      admin.id,
       deadline:         days(3),
+      wordCountTarget:  600,
+      ttwTargetMinutes: 60,
     },
     {
       title:            'Spring Product Launch Email',
@@ -145,6 +149,8 @@ async function main() {
       assignedWriterId: anjana.id,
       createdById:      admin.id,
       deadline:         days(10),
+      wordCountTarget:  400,
+      ttwTargetMinutes: 45,
     },
     {
       title:            'Customer Success Story — Horizon Tech',
@@ -154,6 +160,8 @@ async function main() {
       assignedWriterId: dinu.id,
       createdById:      admin.id,
       deadline:         days(2),
+      wordCountTarget:  1500,
+      ttwTargetMinutes: 120,
     },
     {
       title:            '5 Tips for Better Sleep — Sponsored Article',
@@ -163,6 +171,8 @@ async function main() {
       assignedWriterId: harsh.id,
       createdById:      admin.id,
       deadline:         days(-3),
+      wordCountTarget:  1000,
+      ttwTargetMinutes: 75,
     },
     {
       title:            'New Product Range — Social Campaign Copy',
@@ -172,6 +182,8 @@ async function main() {
       assignedWriterId: raavi.id,
       createdById:      admin.id,
       deadline:         days(7),
+      wordCountTarget:  200,
+      ttwTargetMinutes: 30,
     },
     {
       title:            'Q2 Company Update Press Release',
@@ -181,6 +193,8 @@ async function main() {
       assignedWriterId: sakshi.id,
       createdById:      admin.id,
       deadline:         days(1),
+      wordCountTarget:  500,
+      ttwTargetMinutes: 60,
     },
     {
       title:            'Organic Skincare Line — Product Descriptions',
@@ -190,6 +204,8 @@ async function main() {
       assignedWriterId: sameer.id,
       createdById:      admin.id,
       deadline:         days(14),
+      wordCountTarget:  300,
+      ttwTargetMinutes: 45,
     },
     {
       title:            'B2B SaaS Onboarding Guide',
@@ -199,6 +215,8 @@ async function main() {
       assignedWriterId: taher.id,
       createdById:      admin.id,
       deadline:         days(6),
+      wordCountTarget:  2000,
+      ttwTargetMinutes: 150,
     },
     {
       title:            'Autumn Collection Launch — Email Series',
@@ -208,6 +226,8 @@ async function main() {
       assignedWriterId: titash.id,
       createdById:      admin.id,
       deadline:         days(9),
+      wordCountTarget:  450,
+      ttwTargetMinutes: 60,
     },
     {
       title:            'Peak Performance — Athlete Spotlight Blog',
@@ -217,6 +237,8 @@ async function main() {
       assignedWriterId: nandakumar.id,
       createdById:      admin.id,
       deadline:         days(4),
+      wordCountTarget:  800,
+      ttwTargetMinutes: 75,
     },
     {
       title:            'Nova Digital — Services Page Rewrite',
@@ -226,6 +248,8 @@ async function main() {
       assignedWriterId: abhijeet.id,
       createdById:      admin.id,
       deadline:         days(8),
+      wordCountTarget:  700,
+      ttwTargetMinutes: 90,
     },
     {
       title:            'Horizon Tech — LinkedIn Thought Leadership Series',
@@ -235,6 +259,8 @@ async function main() {
       assignedWriterId: anjana.id,
       createdById:      admin.id,
       deadline:         days(12),
+      wordCountTarget:  250,
+      ttwTargetMinutes: 30,
     },
     {
       title:            'Acme Corp — Annual Report Case Study',
@@ -244,6 +270,8 @@ async function main() {
       assignedWriterId: dinu.id,
       createdById:      admin.id,
       deadline:         days(3),
+      wordCountTarget:  1800,
+      ttwTargetMinutes: 135,
     },
   ]
 

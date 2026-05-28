@@ -123,7 +123,7 @@ export default function AdminArticlePage() {
           <span className="detail-meta-label">TTW</span>
           <span>{article.ttwTargetMinutes ? formatTTW(article.ttwTargetMinutes) : '—'}</span>
         </div>
-        {ttwHours !== null && (
+        {ttwMins !== null && (
           <div className="detail-meta-item">
             <span className="detail-meta-label">Time Taken</span>
             <span className="detail-ttw">{formatTTW(ttwMins)}</span>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import StatusBadge from '../../components/StatusBadge'
 import { apiFetch } from '../../api/client'
-import { formatDate, isOverdue } from '../../lib/utils'
+import { formatDate, isOverdue, formatTTW } from '../../lib/utils'
 
 // ─── Article card ─────────────────────────────────────────────────────────────
 
@@ -23,6 +23,17 @@ function ArticleCard({ article, onClick }) {
         <span className="meta-dot">·</span>
         <span>{article.articleType.name}</span>
       </div>
+      {(article.ttwTargetMinutes || article.ttw != null) && (
+        <div className="article-card-ttw">
+          <span className="article-card-ttw-label">TTW</span>
+          {article.ttw != null
+            ? (article.ttwTargetMinutes
+                ? <span title="Actual / Target">{formatTTW(article.ttw)} / {formatTTW(article.ttwTargetMinutes)}</span>
+                : formatTTW(article.ttw))
+            : formatTTW(article.ttwTargetMinutes)
+          }
+        </div>
+      )}
       <div className={`article-card-deadline ${overdue ? 'article-card-deadline--overdue' : ''}`}>
         {overdue && <span className="overdue-tag">Overdue</span>}
         <span>{formatDate(article.deadline, 'No deadline set')}</span>

@@ -699,6 +699,22 @@ body { min-height: 100vh; }
 }
 .article-card-deadline--overdue { color: var(--color-danger); font-weight: 500; }
 
+.article-card-ttw {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+.article-card-ttw-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted);
+}
+
 .writer-section-title {
   font-size: 0.8rem;
   font-weight: 600;
@@ -1352,6 +1368,7 @@ body { min-height: 100vh; }
 
 /* ─── TTW table cell ─────────────────────────────────────────────────────────── */
 .td-ttw { white-space: nowrap; font-size: 0.85rem; color: var(--color-muted); }
+.ttw-target { color: var(--color-text); font-weight: 500; }
 
 /* ─── TTW / word count in meta strip ────────────────────────────────────────── */
 .detail-ttw { font-weight: 600; color: #15803d; }
