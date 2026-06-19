@@ -12,6 +12,7 @@ const EMPTY_ROW = (writerId = '') => ({
   title: '',
   deadline: '',
   briefNotes: '',
+  notesOpen: false,
 });
 
 export default function BatchAssignModal({ clients, writers, types, defaultWriterId, onClose, onSaved }) {
@@ -82,61 +83,67 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
           <span />
         </div>
         {rows.map((row, idx) => (
-          <div key={row.key} className="batch-row">
-            <select
-              value={row.writerId}
-              onChange={(e) => setRow(idx, { writerId: e.target.value })}
-              required
-            >
-              <option value="">Writer…</option>
-              {writers.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}{w.role === 'TEAM_LEADER' ? ' (TL)' : ''}
-                </option>
-              ))}
-            </select>
+          <div key={row.key} className="batch-row-wrap">
+            <div className="batch-row">
+              <select value={row.writerId} onChange={(e) => setRow(idx, { writerId: e.target.value })} required>
+                <option value="">Writer…</option>
+                {writers.map((w) => (
+                  <option key={w.id} value={w.id}>{w.name}{w.role === 'TEAM_LEADER' ? ' (TL)' : ''}</option>
+                ))}
+              </select>
 
-            <select
-              value={row.clientId}
-              onChange={(e) => setRow(idx, { clientId: e.target.value })}
-              required
-            >
-              <option value="">Client…</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+              <select value={row.clientId} onChange={(e) => setRow(idx, { clientId: e.target.value })} required>
+                <option value="">Client…</option>
+                {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
 
-            <select
-              value={row.articleTypeId}
-              onChange={(e) => setRow(idx, { articleTypeId: e.target.value })}
-              required
-            >
-              <option value="">Type…</option>
-              {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </select>
+              <select value={row.articleTypeId} onChange={(e) => setRow(idx, { articleTypeId: e.target.value })} required>
+                <option value="">Type…</option>
+                {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
 
-            <input
-              value={row.title}
-              onChange={(e) => setRow(idx, { title: e.target.value })}
-              placeholder="Title (optional)"
-            />
+              <input
+                value={row.title}
+                onChange={(e) => setRow(idx, { title: e.target.value })}
+                placeholder="Title (optional)"
+              />
 
-            <input
-              type="date"
-              value={row.deadline}
-              onChange={(e) => setRow(idx, { deadline: e.target.value })}
-            />
+              <input
+                type="date"
+                value={row.deadline}
+                onChange={(e) => setRow(idx, { deadline: e.target.value })}
+              />
 
-            <button
-              type="button"
-              className="icon-btn icon-btn--danger"
-              title="Remove row"
-              disabled={rows.length === 1}
-              onClick={() => removeRow(idx)}
-            >
-              <IconTrash />
-            </button>
+              <button
+                type="button"
+                className="icon-btn icon-btn--danger"
+                title="Remove row"
+                disabled={rows.length === 1}
+                onClick={() => removeRow(idx)}
+              >
+                <IconTrash />
+              </button>
+            </div>
+
+            <div className="batch-notes-bar">
+              <button
+                type="button"
+                className="link-btn"
+                onClick={() => setRow(idx, { notesOpen: !row.notesOpen })}
+              >
+                {row.notesOpen ? '− hide notes' : '＋ add brief notes'}
+              </button>
+            </div>
+
+            {row.notesOpen && (
+              <textarea
+                className="batch-notes-input"
+                rows="2"
+                value={row.briefNotes}
+                onChange={(e) => setRow(idx, { briefNotes: e.target.value })}
+                placeholder="Context, keywords, tone, instructions for the writer…"
+              />
+            )}
           </div>
         ))}
 

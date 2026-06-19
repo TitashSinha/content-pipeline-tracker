@@ -43,7 +43,9 @@ export default function Layout({ children }) {
   const [searchQ, setSearchQ] = useState('');
   const [searchResults, setSearchResults] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searching, setSearching] = useState(false);
   const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
   const debouncedQ = useDebounce(searchQ, 250);
 
   const home = user.role === 'ADMIN' ? '/admin' : user.role === 'TEAM_LEADER' ? '/tl' : '/writer';
@@ -57,11 +59,26 @@ export default function Layout({ children }) {
 
   // Fetch search results when debounced query changes
   useEffect(() => {
-    if (debouncedQ.length < 2) { setSearchResults(null); return; }
+    if (debouncedQ.length < 2) { setSearchResults(null); setSearching(false); return; }
+    setSearching(true);
+    setSearchResults(null);
     api.searchAll(debouncedQ)
-      .then(setSearchResults)
-      .catch(() => setSearchResults(null));
+      .then((r) => { setSearchResults(r); setSearching(false); })
+      .catch(() => { setSearchResults(null); setSearching(false); });
   }, [debouncedQ]);
+
+  // ⌘K / Ctrl+K opens and focuses search
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   // Close search on outside click
   useEffect(() => {
@@ -145,9 +162,10 @@ export default function Layout({ children }) {
             <div className={`topbar-search-box ${searchOpen ? 'topbar-search-box--open' : ''}`}>
               <IconSearch className="topbar-search-icon" />
               <input
+                ref={searchInputRef}
                 className="topbar-search-input"
                 value={searchQ}
-                placeholder="Search writers, clients, content…"
+                placeholder="Search… (⌘K)"
                 onFocus={() => setSearchOpen(true)}
                 onChange={(e) => { setSearchQ(e.target.value); setSearchOpen(true); }}
                 onKeyDown={(e) => e.key === 'Escape' && (setSearchOpen(false), setSearchQ(''))}
@@ -156,7 +174,8 @@ export default function Layout({ children }) {
 
             {searchOpen && debouncedQ.length >= 2 && (
               <div className="search-dropdown">
-                {!hasResults && <p className="search-empty">No results for "{debouncedQ}"</p>}
+                {searching && <p className="search-empty search-loading">Searching…</p>}
+                {!searching && !hasResults && <p className="search-empty">No results for "{debouncedQ}"</p>}
 
                 {searchResults?.articles?.length > 0 && (
                   <div className="search-section">

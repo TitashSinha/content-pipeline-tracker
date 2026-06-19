@@ -120,29 +120,6 @@ export default function ArticleDetail({ article, role, onChange, backTo, backLab
         <StatusBadge status={article.status} size="lg" />
       </div>
 
-      <div className="card detail-meta">
-        <Meta label="Client" value={article.clientName} />
-        <Meta label="Type" value={article.typeName} />
-        <Meta label="Deadline" value={formatDate(article.deadline)} danger={overdue} />
-        {article.wordCountTarget != null && <Meta label="Word count" value={`${article.wordCountTarget} words`} />}
-        {article.ttwTargetMinutes != null && <Meta label="TTW target" value={formatTTW(article.ttwTargetMinutes)} />}
-        {article.status === 'COMPLETED' && <Meta label="Time taken" value={ttwDisplay(article)} />}
-        <Meta label="Writer" value={article.writerName} />
-        <Meta label="Created by" value={article.createdByName} />
-      </div>
-
-      {article.briefNotes && (
-        <div className="card">
-          <h2 className="card-title">Brief Notes</h2>
-          <p className="brief-notes">{article.briefNotes}</p>
-        </div>
-      )}
-
-      <div className="card">
-        <h2 className="card-title">Progress</h2>
-        <Stepper status={article.status} />
-      </div>
-
       <div className="card">
         <h2 className="card-title">Update Status</h2>
         {article.status === 'COMPLETED' ? (
@@ -178,6 +155,29 @@ export default function ArticleDetail({ article, role, onChange, backTo, backLab
             </label>
           </>
         )}
+      </div>
+
+      <div className="card detail-meta">
+        <Meta label="Client" value={article.clientName} />
+        <Meta label="Type" value={article.typeName} />
+        <Meta label="Deadline" value={formatDate(article.deadline)} danger={overdue} />
+        {article.wordCountTarget != null && <Meta label="Word count" value={`${article.wordCountTarget} words`} />}
+        {article.ttwTargetMinutes != null && <Meta label="TTW target" value={formatTTW(article.ttwTargetMinutes)} />}
+        {article.status === 'COMPLETED' && <Meta label="Time taken" value={ttwDisplay(article)} />}
+        <Meta label="Writer" value={article.writerName} />
+        <Meta label="Created by" value={article.createdByName} />
+      </div>
+
+      {article.briefNotes && (
+        <div className="card">
+          <h2 className="card-title">Brief Notes</h2>
+          <p className="brief-notes">{article.briefNotes}</p>
+        </div>
+      )}
+
+      <div className="card">
+        <h2 className="card-title">Progress</h2>
+        <Stepper status={article.status} />
       </div>
 
       {(role === 'ADMIN' || role === 'TEAM_LEADER') && (

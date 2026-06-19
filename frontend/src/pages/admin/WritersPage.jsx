@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import Loader from '../../components/Loader.jsx';
@@ -8,7 +8,7 @@ import WriterForm from '../../components/admin/WriterForm.jsx';
 import BatchAssignModal from '../../components/admin/BatchAssignModal.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { formatDate } from '../../lib/utils.js';
-import { IconPlus, IconEdit, IconTrash, IconBatch } from '../../lib/icons.jsx';
+import { IconPlus, IconEdit, IconTrash, IconBatch, IconSearch } from '../../lib/icons.jsx';
 
 export default function WritersPage() {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ export default function WritersPage() {
   const [removing, setRemoving] = useState(null);
   const [batchWriter, setBatchWriter] = useState(null); // writer to batch-assign
   const [busy, setBusy] = useState(false);
+  const [q, setQ] = useState('');
 
   async function load() {
     const [w, arch, articles, t, clientList] = await Promise.all([
@@ -38,6 +39,14 @@ export default function WritersPage() {
   useEffect(() => { load(); }, []);
 
   if (!writers) return <Loader full />;
+
+  const displayed = q
+    ? writers.filter((w) =>
+        w.name.toLowerCase().includes(q.toLowerCase()) ||
+        w.email?.toLowerCase().includes(q.toLowerCase()) ||
+        w.specialties?.toLowerCase().includes(q.toLowerCase())
+      )
+    : writers;
 
   async function openEdit(w) {
     try {
@@ -85,11 +94,19 @@ export default function WritersPage() {
       {writers.length === 0 ? (
         <EmptyState title="No writers yet" message="Add your first writer so you can assign content to them." />
       ) : (
-        <div className="card no-pad">
+        <>
+          <div className="roster-search">
+            <IconSearch />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name, email or specialty…" />
+          </div>
+          <div className="card no-pad">
           <table className="table">
             <thead><tr><th>Name</th><th>Email</th><th>Specialties</th><th>Articles</th><th aria-label="Actions" /></tr></thead>
             <tbody>
-              {writers.map((w) => (
+              {displayed.length === 0 && (
+                <tr><td colSpan={5} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No writers match "{q}"</td></tr>
+              )}
+              {displayed.map((w) => (
                 <tr key={w.id} className="row-link" onClick={() => navigate(`/admin/writers/${w.id}`)}>
                   <td className="cell-strong">
                     {w.name}
@@ -108,6 +125,7 @@ export default function WritersPage() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {archived.length > 0 && (

@@ -167,6 +167,7 @@ router.put('/:id', authRequired, teamLeaderOrAdminOnly, (req, res) => {
 
   const b = req.body || {};
   const prevWriterId = a.assignedWriterId;
+  const prevDeadline = a.deadline;
   const idFields = ['clientId', 'articleTypeId', 'assignedWriterId'];
   const numFields = ['wordCountTarget', 'ttwTargetMinutes'];
   const textFields = ['title', 'deadline', 'briefNotes'];
@@ -177,6 +178,21 @@ router.put('/:id', authRequired, teamLeaderOrAdminOnly, (req, res) => {
   for (const f of textFields)
     if (f in b) a[f] = b[f] === '' || b[f] == null ? null : String(b[f]).trim();
   if ('referenceLinks' in b) a.referenceLinks = sanitizeLinks(b.referenceLinks);
+
+  // Record a deadline change in the activity log.
+  if ('deadline' in b && a.deadline !== prevDeadline) {
+    const fmt = (d) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'not set';
+    db.activityLogs.push({
+      id: nextId('activityLogs'),
+      articleId: a.id,
+      changedById: req.user.id,
+      oldStatus: a.status,
+      newStatus: a.status,
+      kind: 'deadline',
+      note: `Deadline changed from ${fmt(prevDeadline)} to ${fmt(a.deadline)}`,
+      createdAt: new Date().toISOString(),
+    });
+  }
 
   // Record a reassignment in the activity log when the writer actually changes.
   if ('assignedWriterId' in b && Number(b.assignedWriterId) !== prevWriterId) {

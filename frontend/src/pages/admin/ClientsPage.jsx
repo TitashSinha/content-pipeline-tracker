@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import Loader from '../../components/Loader.jsx';
@@ -6,7 +6,7 @@ import EmptyState from '../../components/EmptyState.jsx';
 import ClientForm from '../../components/admin/ClientForm.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
 import { useToast } from '../../components/Toast.jsx';
-import { IconPlus, IconEdit, IconTrash } from '../../lib/icons.jsx';
+import { IconPlus, IconEdit, IconTrash, IconSearch } from '../../lib/icons.jsx';
 
 export default function ClientsPage() {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ export default function ClientsPage() {
   const [editing, setEditing] = useState(undefined); // undefined=closed, null=new, obj=edit
   const [deleting, setDeleting] = useState(null);
   const [delBusy, setDelBusy] = useState(false);
+  const [q, setQ] = useState('');
 
   async function load() {
     const [c, t] = await Promise.all([api.listClients(), api.listTypes()]);
@@ -40,6 +41,14 @@ export default function ClientsPage() {
 
   if (!clients) return <Loader full />;
 
+  const displayed = q
+    ? clients.filter((c) =>
+        c.name.toLowerCase().includes(q.toLowerCase()) ||
+        c.industry?.toLowerCase().includes(q.toLowerCase()) ||
+        c.contentTypeName?.toLowerCase().includes(q.toLowerCase())
+      )
+    : clients;
+
   return (
     <div className="page">
       <div className="page-head">
@@ -55,11 +64,19 @@ export default function ClientsPage() {
       {clients.length === 0 ? (
         <EmptyState title="No clients yet" message="Add your first client to start assigning content." />
       ) : (
-        <div className="card no-pad">
+        <>
+          <div className="roster-search">
+            <IconSearch />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name, industry or type…" />
+          </div>
+          <div className="card no-pad">
           <table className="table">
             <thead><tr><th>Name</th><th>Content type</th><th>Industry</th><th aria-label="Actions" /></tr></thead>
             <tbody>
-              {clients.map((c) => (
+              {displayed.length === 0 && (
+                <tr><td colSpan={4} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No clients match "{q}"</td></tr>
+              )}
+              {displayed.map((c) => (
                 <tr key={c.id} className="row-link" onClick={() => navigate(`/admin/clients/${c.id}`)}>
                   <td className="cell-strong">{c.name}</td>
                   <td>{c.contentTypeName ?? '—'}</td>
@@ -73,6 +90,7 @@ export default function ClientsPage() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {editing !== undefined && (

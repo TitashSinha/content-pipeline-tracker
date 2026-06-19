@@ -4,7 +4,7 @@ import { IconCheck, IconClose, IconInfo } from '../lib/icons.jsx';
 const ToastContext = createContext(null);
 export const useToast = () => useContext(ToastContext);
 
-const LIFESPAN = 2000; // ms — matches the progress-bar animation
+const LIFESPAN = 3000; // ms — matches the progress-bar animation
 const MAX_VISIBLE = 2;
 
 const ICONS = {

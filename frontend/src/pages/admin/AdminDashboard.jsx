@@ -239,10 +239,20 @@ export default function AdminDashboard() {
         <div className="card stage-panel">
           <h2 className="card-title">By Stage</h2>
           <div className="stage-panel-body">
-            <Donut segments={STATUSES.map((s) => ({ value: periodStats.byStage[s] || 0, color: STAGE_COLORS[s] }))} />
+            <Donut
+              segments={STATUSES.map((s) => ({ value: periodStats.byStage[s] || 0, color: STAGE_COLORS[s] }))}
+              onSegmentClick={(i) => {
+                const s = STATUSES[i];
+                setFilters((f) => ({ ...f, status: f.status === s ? '' : s }));
+              }}
+            />
             <ul className="stage-legend">
               {STATUSES.map((s) => (
-                <li key={s}>
+                <li
+                  key={s}
+                  className={`legend-item${filters.status === s ? ' legend-item--active' : ''}`}
+                  onClick={() => setFilters((f) => ({ ...f, status: f.status === s ? '' : s }))}
+                >
                   <span className="legend-dot" style={{ background: STAGE_COLORS[s] }} />
                   <span className="legend-label">{STATUS_LABELS[s]}</span>
                   <span className="legend-count">{periodStats.byStage[s] || 0}</span>
@@ -301,8 +311,12 @@ export default function AdminDashboard() {
       <div className="card no-pad">
         {filtered.length === 0 ? (
           <EmptyState
-            title="No content matches"
-            message={filterActive || dateRange !== 'all' ? 'Try adjusting your filters or switching to All Time.' : 'Create your first piece of content to get started.'}
+            title={data.articles.length === 0 ? 'No content yet' : 'No content matches'}
+            message={
+              data.articles.length === 0
+                ? 'Create your first piece of content to get started.'
+                : 'Try adjusting your filters or switching to All Time.'
+            }
           />
         ) : (
           <>

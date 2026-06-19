@@ -1,6 +1,6 @@
 // Lightweight SVG donut chart with animated transitions.
-// segments: [{ value, color }]
-export default function Donut({ segments, size = 130, stroke = 18 }) {
+// segments: [{ value, color }] — pass onSegmentClick(i) to make slices clickable.
+export default function Donut({ segments, size = 130, stroke = 18, onSegmentClick }) {
   const sum = segments.reduce((s, x) => s + x.value, 0);
   const r = (size - stroke) / 2;
   const circumference = 2 * Math.PI * r;
@@ -24,7 +24,11 @@ export default function Donut({ segments, size = 130, stroke = 18 }) {
                 strokeWidth={stroke}
                 strokeDasharray={`${len} ${circumference - len}`}
                 strokeDashoffset={-offset}
-                style={{ transition: 'stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease' }}
+                onClick={onSegmentClick ? () => onSegmentClick(i) : undefined}
+                style={{
+                  transition: 'stroke-dasharray 0.4s ease, stroke-dashoffset 0.4s ease',
+                  cursor: onSegmentClick ? 'pointer' : undefined,
+                }}
               />
             );
             offset += len;
