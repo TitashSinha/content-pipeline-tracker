@@ -1,9 +1,9 @@
-# Content Pipeline Tracker
+# Content Pipeline Tracker V2
 
-An internal workflow tool for the **Lexiconn** content agency. Admins assign writing
-tasks and review them; writers move their work through the pipeline. Every piece of
-content flows through four stages and the time spent actually writing (TTW) is tracked
-automatically.
+An internal workflow tool for the **Lexiconn** content agency. Admins and Team Leaders
+assign writing tasks and review them; writers move their work through the pipeline. Every
+piece of content flows through four stages and the time spent actually writing (TTW) is
+tracked automatically.
 
 ```
 BRIEF PENDING  →  WRITING  →  REVIEW  →  COMPLETED
@@ -14,17 +14,38 @@ BRIEF PENDING  →  WRITING  →  REVIEW  →  COMPLETED
 
 ---
 
+## What's new in V2
+
+- **Team Leader role.** A third role between Admin and Writer — TLs get their own
+  dashboard, can create and review content, and mark articles complete, but cannot delete
+  articles or manage clients. Admins promote writers to TL from the Writers page.
+- **Batch assign.** Create multiple articles at once via a grid modal. Writers page has a
+  per-writer shortcut that pre-fills the writer on every row.
+- **Global search.** The top-bar search (replaces the hamburger on desktop) searches
+  articles, writers, and clients with debounced, categorised results.
+- **Dashboard date filters.** Today (default) / Week / Month / All — the donut, stats,
+  and table all filter together. Animated 400 ms donut transition. CSV export honours the
+  active filter. Refresh resets to Today.
+- **Toast notifications.** Sitewide animated toasts on every save, with a 2 s progress
+  bar, max 2 stacked, non-blocking.
+- **Client article list.** Client detail pages now show active and completed articles for
+  that client, plus a "New content" button pre-filled with the client.
+
+---
+
 ## Highlights
 
-- **Two roles, two dashboards.** Admins see everything and manage the pipeline; writers
-  see only their own assignments.
+- **Three roles, three dashboards.** Admins manage the full pipeline; Team Leaders
+  oversee and review without destructive access; writers see only their own assignments.
 - **TTW (Time to Write).** The clock runs only while a piece is in `WRITING`, pausing in
   review and resuming on every send-back. Actual time is summed from the activity log.
 - **Admin dashboard.** Live stats, a by-stage donut, per-writer workload, plus a
-  searchable / filterable / sortable / paginated table with CSV export.
+  searchable / filterable / sortable / paginated table with CSV export — all filterable
+  by date range.
 - **Full audit trail.** Every status change is recorded forever, with who, when, and an
   optional note (this is how feedback travels back to the writer).
-- **Client management.** Add and rename clients from the UI.
+- **Client & writer management.** Rich detail pages with metadata, portfolio links,
+  notes, and now a full article history per client.
 - **Soft, modern UI.** A pastel design system, responsive down to mobile (the table
   collapses into cards).
 
@@ -75,7 +96,8 @@ All accounts use the password **`Lexiconn@2025`**.
 | Role | Email |
 |------|-------|
 | Admin | `admin@lexiconn.in` |
-| Writer | `titash@lexiconn.in` (and nine other writers — see the seed file) |
+| Team Leader | `tl@lexiconn.in` (or any writer promoted to TL via the Writers page) |
+| Writer | `titash@lexiconn.in` (and other writers — see the seed file) |
 
 The login screen has one-click **Admin** / **Writer** buttons to fill these in.
 
@@ -89,16 +111,37 @@ backend/
     index.js              Express app + static serving in production
     db.js                 JSON datastore (load / persist / nextId)
     seed.js               Demo data + interval-based activity logs
-    auth.js               JWT signing + auth/admin middleware
+    auth.js               JWT signing + auth / adminOnly / teamLeaderOrAdminOnly middleware
     ttw.js                TTW interval-summing logic
-    routes/               auth, articles, clients, users, articleTypes, dashboard
+    routes/
+      auth.routes.js
+      articles.routes.js  Includes POST /batch for batch creation
+      clients.routes.js
+      users.routes.js     WRITER + TEAM_LEADER assignable roles
+      articleTypes.routes.js
+      dashboard.routes.js
+      search.routes.js    GET /api/search?q= (articles / writers / clients)
+      quote.routes.js
 frontend/
   src/
     api/client.js         Single fetch wrapper (attaches the JWT)
     context/AuthContext   Logged-in user, kept in localStorage
-    components/            Layout, StatusBadge, Stepper, Timeline, Donut, Modal, …
-    pages/                 Login, ChangePassword, admin/*, writer/*
-    lib/                   constants, utils (formatTTW, isOverdue, …), icons
+    components/
+      Layout.jsx          Global search bar, role-aware nav, (TL) chip
+      Donut.jsx           Animated SVG donut chart
+      Toast.jsx           Sitewide toast notification system
+      admin/
+        ArticleForm.jsx
+        BatchAssignModal.jsx
+        ClientForm.jsx
+        WriterForm.jsx    Includes Team Leader toggle
+    pages/
+      admin/              AdminDashboard, AdminArticlePage, ClientsPage,
+                          ClientDetailPage, WritersPage, WriterDetailPage
+      tl/                 TLDashboard, TLArticlePage, TLMyContent
+      writer/             WriterDashboard, WriterArticlePage
+    routes/ProtectedRoute.jsx   Accepts role as string or array
+    lib/                  constants, utils, icons
     index.css             The entire design system
 docs/
   PRODUCTION_LOG.md       Chronological build log (how this was made)
@@ -127,17 +170,21 @@ See `backend/src/ttw.js`.
 
 ## Permissions
 
-| Action | Writer | Admin |
-|--------|:------:|:-----:|
-| See own articles | ✓ | ✓ |
-| See all articles | — | ✓ |
-| Create / edit / delete article | — | ✓ |
-| `BRIEF_PENDING → WRITING` | ✓ | ✓ |
-| `WRITING → REVIEW` | ✓ | ✓ |
-| `REVIEW → WRITING` (with feedback) | ✓ | ✓ |
-| `REVIEW → COMPLETED` | — | ✓ |
-| Save Google Doc link | ✓ | ✓ |
-| Manage clients / export CSV / view stats | — | ✓ |
+| Action | Writer | Team Leader | Admin |
+|--------|:------:|:-----------:|:-----:|
+| See own articles | ✓ | ✓ | ✓ |
+| See all articles | — | ✓ | ✓ |
+| Create / edit article | — | ✓ | ✓ |
+| Batch assign articles | — | ✓ | ✓ |
+| Delete article | — | — | ✓ |
+| `BRIEF_PENDING → WRITING` | ✓ | ✓ | ✓ |
+| `WRITING → REVIEW` | ✓ | ✓ | ✓ |
+| `REVIEW → WRITING` (with feedback) | ✓ | ✓ | ✓ |
+| `REVIEW → COMPLETED` | — | ✓ | ✓ |
+| Save reference links | ✓ | ✓ | ✓ |
+| Manage clients / writers | — | — | ✓ |
+| Promote writer to Team Leader | — | — | ✓ |
+| Export CSV / view full stats | — | ✓ | ✓ |
 
 ---
 
