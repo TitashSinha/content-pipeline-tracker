@@ -1,0 +1,17 @@
+{
+  "name": "content-pipeline-tracker",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Internal content workflow tracker for Lexiconn — admin + writer dashboards, TTW tracking.",
+  "scripts": {
+    "dev": "concurrently -n api,web -c cyan,magenta \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "install:all": "npm install && npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend run start",
+    "seed": "npm --prefix backend run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
