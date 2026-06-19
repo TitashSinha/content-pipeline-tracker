@@ -23,6 +23,7 @@ export default function WritersPage() {
   const [batchWriter, setBatchWriter] = useState(null); // writer to batch-assign
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState('');
+  const [tab, setTab] = useState('all');
 
   async function load() {
     const [w, arch, articles, t, clientList] = await Promise.all([
@@ -40,13 +41,22 @@ export default function WritersPage() {
 
   if (!writers) return <Loader full />;
 
-  const displayed = q
-    ? writers.filter((w) =>
-        w.name.toLowerCase().includes(q.toLowerCase()) ||
-        w.email?.toLowerCase().includes(q.toLowerCase()) ||
-        w.specialties?.toLowerCase().includes(q.toLowerCase())
-      )
-    : writers;
+  const ROLE_TABS = [
+    { key: 'all', label: 'All', count: writers.length },
+    { key: 'WRITER', label: 'Writers', count: writers.filter((w) => w.role === 'WRITER').length },
+    { key: 'TEAM_LEADER', label: 'Team Leaders', count: writers.filter((w) => w.role === 'TEAM_LEADER').length },
+    { key: 'archived', label: 'Archived', count: archived.length },
+  ];
+
+  const displayed = writers.filter((w) => {
+    if (tab === 'WRITER' && w.role !== 'WRITER') return false;
+    if (tab === 'TEAM_LEADER' && w.role !== 'TEAM_LEADER') return false;
+    if (q) {
+      const lq = q.toLowerCase();
+      return w.name.toLowerCase().includes(lq) || w.email?.toLowerCase().includes(lq) || w.specialties?.toLowerCase().includes(lq);
+    }
+    return true;
+  });
 
   async function openEdit(w) {
     try {
@@ -83,7 +93,7 @@ export default function WritersPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Writers</h1>
+          <h1>People</h1>
           <p className="muted">{writers.length} active · {archived.length} in bin</p>
         </div>
         <button type="button" className="btn btn--primary" onClick={() => setEditing(null)}>
@@ -91,7 +101,40 @@ export default function WritersPage() {
         </button>
       </div>
 
-      {writers.length === 0 ? (
+      <div className="role-tabs">
+        {ROLE_TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            className={`role-tab${tab === t.key ? ' role-tab--active' : ''}`}
+            onClick={() => { setTab(t.key); setQ(''); }}
+          >
+            {t.label} <span className="role-tab-count">{t.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {tab === 'archived' ? (
+        archived.length === 0 ? (
+          <EmptyState title="Bin is empty" message="Archived writers will appear here." />
+        ) : (
+          <div className="card">
+            <h2 className="card-title">Archived writers</h2>
+            {archived.map((w) => (
+              <div key={w.id} className="bin-row">
+                <div>
+                  <strong>{w.name}</strong> <span className="muted">· {w.email}</span>
+                  <div className="muted tiny">Removed {formatDate(w.archivedAt)}</div>
+                </div>
+                <div className="bin-actions">
+                  <button type="button" className="btn btn--ghost btn--sm" onClick={() => restore(w.id)}>Restore</button>
+                  <button type="button" className="btn btn--danger btn--sm" onClick={() => purge(w.id)}>Delete</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : writers.length === 0 ? (
         <EmptyState title="No writers yet" message="Add your first writer so you can assign content to them." />
       ) : (
         <>
@@ -100,50 +143,32 @@ export default function WritersPage() {
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name, email or specialty…" />
           </div>
           <div className="card no-pad">
-          <table className="table">
-            <thead><tr><th>Name</th><th>Email</th><th>Specialties</th><th>Articles</th><th aria-label="Actions" /></tr></thead>
-            <tbody>
-              {displayed.length === 0 && (
-                <tr><td colSpan={5} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No writers match "{q}"</td></tr>
-              )}
-              {displayed.map((w) => (
-                <tr key={w.id} className="row-link" onClick={() => navigate(`/admin/writers/${w.id}`)}>
-                  <td className="cell-strong">
-                    {w.name}
-                    {w.role === 'TEAM_LEADER' && <span className="tl-badge">TL</span>}
-                  </td>
-                  <td className="muted">{w.email}</td>
-                  <td className="muted">{w.specialties ?? '—'}</td>
-                  <td>{counts[w.id] || 0}</td>
-                  <td className="col-actions" onClick={(e) => e.stopPropagation()}>
-                    <button type="button" className="icon-btn" title="Batch assign" onClick={() => setBatchWriter(w)}><IconBatch /></button>
-                    <button type="button" className="icon-btn" title="Edit" onClick={() => openEdit(w)}><IconEdit /></button>
-                    <button type="button" className="icon-btn icon-btn--danger" title="Remove writer" onClick={() => setRemoving({ ...w, count: counts[w.id] || 0 })}><IconTrash /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            <table className="table">
+              <thead><tr><th>Name</th><th>Email</th><th>Specialties</th><th>Articles</th><th aria-label="Actions" /></tr></thead>
+              <tbody>
+                {displayed.length === 0 && (
+                  <tr><td colSpan={5} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No people match "{q}"</td></tr>
+                )}
+                {displayed.map((w) => (
+                  <tr key={w.id} className="row-link" onClick={() => navigate(`/admin/writers/${w.id}`)}>
+                    <td className="cell-strong">
+                      {w.name}
+                      {w.role === 'TEAM_LEADER' && <span className="tl-badge">TL</span>}
+                    </td>
+                    <td className="muted">{w.email}</td>
+                    <td className="muted">{w.specialties ?? '—'}</td>
+                    <td>{counts[w.id] || 0}</td>
+                    <td className="col-actions" onClick={(e) => e.stopPropagation()}>
+                      <button type="button" className="icon-btn" title="Batch assign" onClick={() => setBatchWriter(w)}><IconBatch /></button>
+                      <button type="button" className="icon-btn" title="Edit" onClick={() => openEdit(w)}><IconEdit /></button>
+                      <button type="button" className="icon-btn icon-btn--danger" title="Remove writer" onClick={() => setRemoving({ ...w, count: counts[w.id] || 0 })}><IconTrash /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
-      )}
-
-      {archived.length > 0 && (
-        <div className="card">
-          <h2 className="card-title">Recently removed (bin)</h2>
-          {archived.map((w) => (
-            <div key={w.id} className="bin-row">
-              <div>
-                <strong>{w.name}</strong> <span className="muted">· {w.email}</span>
-                <div className="muted tiny">Removed {formatDate(w.archivedAt)}</div>
-              </div>
-              <div className="bin-actions">
-                <button type="button" className="btn btn--ghost btn--sm" onClick={() => restore(w.id)}>Restore</button>
-                <button type="button" className="btn btn--danger btn--sm" onClick={() => purge(w.id)}>Delete</button>
-              </div>
-            </div>
-          ))}
-        </div>
       )}
 
       {editing !== undefined && (

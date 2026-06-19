@@ -87,9 +87,16 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
             <div className="batch-row">
               <select value={row.writerId} onChange={(e) => setRow(idx, { writerId: e.target.value })} required>
                 <option value="">Writer…</option>
-                {writers.map((w) => (
-                  <option key={w.id} value={w.id}>{w.name}{w.role === 'TEAM_LEADER' ? ' (TL)' : ''}</option>
-                ))}
+                <optgroup label="Team Leaders">
+                  {writers.filter((w) => w.role === 'TEAM_LEADER').map((w) => (
+                    <option key={w.id} value={w.id}>{w.name}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Writers">
+                  {writers.filter((w) => w.role === 'WRITER').map((w) => (
+                    <option key={w.id} value={w.id}>{w.name}</option>
+                  ))}
+                </optgroup>
               </select>
 
               <select value={row.clientId} onChange={(e) => setRow(idx, { clientId: e.target.value })} required>

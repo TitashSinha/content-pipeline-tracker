@@ -164,7 +164,7 @@ export default function ArticleDetail({ article, role, onChange, backTo, backLab
         {article.wordCountTarget != null && <Meta label="Word count" value={`${article.wordCountTarget} words`} />}
         {article.ttwTargetMinutes != null && <Meta label="TTW target" value={formatTTW(article.ttwTargetMinutes)} />}
         {article.status === 'COMPLETED' && <Meta label="Time taken" value={ttwDisplay(article)} />}
-        <Meta label="Writer" value={article.writerName} />
+        <Meta label="Assigned to" value={`${article.writerName || '—'}${article.writerRole === 'TEAM_LEADER' ? ' (TL)' : article.writerRole === 'ADMIN' ? ' (Admin)' : ''}`} />
         <Meta label="Created by" value={article.createdByName} />
       </div>
 
@@ -182,14 +182,23 @@ export default function ArticleDetail({ article, role, onChange, backTo, backLab
 
       {(role === 'ADMIN' || role === 'TEAM_LEADER') && (
         <div className="card">
-          <h2 className="card-title">Assigned writer</h2>
-          <p className="reassign-current">Currently: <strong>{article.writerName}</strong></p>
+          <h2 className="card-title">Assignee</h2>
+          <p className="reassign-current">
+            Currently: <strong>{article.writerName}</strong>
+            {article.writerRole === 'TEAM_LEADER' && <span className="role-chip role-chip--tl">TL</span>}
+            {article.writerRole === 'ADMIN' && <span className="role-chip role-chip--admin">Admin</span>}
+          </p>
           <div className="reassign-row">
             <select value={reassignTo} onChange={(e) => setReassignTo(e.target.value)}>
               <option value="">Reassign to…</option>
-              {writers
-                .filter((w) => w.id !== article.assignedWriterId)
-                .map((w) => <option key={w.id} value={w.id}>{w.name}{w.role === 'TEAM_LEADER' ? ' (TL)' : ''}</option>)}
+              <optgroup label="Team Leaders">
+                {writers.filter((w) => w.role === 'TEAM_LEADER' && w.id !== article.assignedWriterId)
+                  .map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+              </optgroup>
+              <optgroup label="Writers">
+                {writers.filter((w) => w.role === 'WRITER' && w.id !== article.assignedWriterId)
+                  .map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+              </optgroup>
             </select>
             <button type="button" className="btn btn--ghost" disabled={busy || !reassignTo} onClick={reassign}>
               Reassign

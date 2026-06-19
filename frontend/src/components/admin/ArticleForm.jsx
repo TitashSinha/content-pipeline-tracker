@@ -83,10 +83,15 @@ export default function ArticleForm({ article, clients, writers, types, onClose,
         </label>
 
         <label className="field">
-          <span>Assigned writer *</span>
+          <span>Assign to *</span>
           <select value={form.assignedWriterId} onChange={set('assignedWriterId')}>
             <option value="">Select…</option>
-            {writers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+            <optgroup label="Team Leaders">
+              {writers.filter((w) => w.role === 'TEAM_LEADER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+            </optgroup>
+            <optgroup label="Writers">
+              {writers.filter((w) => w.role === 'WRITER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+            </optgroup>
           </select>
         </label>
 

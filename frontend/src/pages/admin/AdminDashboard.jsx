@@ -341,7 +341,12 @@ export default function AdminDashboard() {
         </select>
         <select value={filters.writer} onChange={(e) => setFilters((f) => ({ ...f, writer: e.target.value }))}>
           <option value="">All writers</option>
-          {data.writers.map((w) => <option key={w.id} value={w.id}>{w.name}{w.role === 'TEAM_LEADER' ? ' (TL)' : ''}</option>)}
+          <optgroup label="Team Leaders">
+            {data.writers.filter((w) => w.role === 'TEAM_LEADER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </optgroup>
+          <optgroup label="Writers">
+            {data.writers.filter((w) => w.role === 'WRITER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </optgroup>
         </select>
         <select value={filters.client} onChange={(e) => setFilters((f) => ({ ...f, client: e.target.value }))}>
           <option value="">All clients</option>
@@ -486,7 +491,10 @@ function WorkloadRow({ writer, busiest }) {
     <div className="workload-row">
       <span className="workload-avatar">{initials(writer.name)}</span>
       <div className="workload-meta">
-        <span className="workload-name">{writer.name}</span>
+        <span className="workload-name">
+          {writer.name}
+          {writer.role === 'TEAM_LEADER' && <span className="role-chip role-chip--tl">TL</span>}
+        </span>
         <div className="workload-bar">
           <span className="workload-fill" style={{ width: `${(writer.active / busiest) * 100}%` }} />
         </div>

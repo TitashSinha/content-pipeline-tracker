@@ -23,8 +23,9 @@ const writerName = (db, id) => {
 };
 
 // For historical attribution, also look in the bin so past actions keep a name.
-const resolveUserName = (db, id) =>
-  (db.users.find((u) => u.id === id) || db.archivedUsers.find((u) => u.id === id))?.name ?? null;
+const resolveUser = (db, id) =>
+  db.users.find((u) => u.id === id) || db.archivedUsers.find((u) => u.id === id) || null;
+const resolveUserName = (db, id) => resolveUser(db, id)?.name ?? null;
 
 const isOverdue = (a) =>
   !!(a.deadline && a.status !== 'COMPLETED' && new Date(a.deadline) < new Date());
@@ -63,7 +64,10 @@ function enrichDetail(db, a) {
   const logs = db.activityLogs
     .filter((l) => l.articleId === a.id)
     .sort((x, y) => new Date(x.createdAt) - new Date(y.createdAt))
-    .map((l) => ({ ...l, changedByName: resolveUserName(db, l.changedById) }));
+    .map((l) => {
+      const u = resolveUser(db, l.changedById);
+      return { ...l, changedByName: u?.name ?? null, changedByRole: u?.role ?? null };
+    });
   return {
     ...enrichList(db, a),
     createdByName: resolveUserName(db, a.createdById),
