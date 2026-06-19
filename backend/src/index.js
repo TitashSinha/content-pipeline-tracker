@@ -46,5 +46,7 @@ if (existsSync(dist)) {
 
 // Use BACKEND_PORT (not PORT) so a dev-runner that injects PORT for the
 // frontend can't accidentally steer the API onto the same port.
-const PORT = process.env.BACKEND_PORT || 4000;
+// Railway injects PORT; local dev uses BACKEND_PORT to avoid clashing with the
+// Vite dev server which concurrently receives its own PORT from the same shell.
+const PORT = process.env.BACKEND_PORT || process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));

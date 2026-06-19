@@ -1,6 +1,8 @@
 // Single choke-point for every backend call. Attaches the JWT, parses JSON,
 // and throws an Error carrying the server's message on failure.
-const BASE = '/api';
+// In production, VITE_API_URL points to the deployed backend (e.g. Railway).
+// In local dev the Vite proxy routes /api → localhost:4000, so the fallback works.
+const BASE = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/$/, '');
 const TOKEN_KEY = 'cpt_token';
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
