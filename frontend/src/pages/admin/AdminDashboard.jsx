@@ -16,6 +16,7 @@ import {
   IconPlus, IconSearch, IconRefresh, IconDownload,
   IconEdit, IconTrash, IconExternal, IconSort, IconBatch, IconFilter,
 } from '../../lib/icons.jsx';
+import DatePickerPopover from '../../components/DatePickerPopover.jsx';
 
 const PAGE_SIZE = 20;
 
@@ -41,8 +42,23 @@ const DATE_RANGES = [
   { key: 'all', label: 'All Time' },
 ];
 
-function inDateRange(article, range) {
+function inDateRange(article, range, customFilter) {
   if (range === 'all') return true;
+  if (range === 'custom' && customFilter) {
+    const d = new Date(article.createdAt);
+    d.setHours(0, 0, 0, 0);
+    if (customFilter.mode === 'range') {
+      const from = new Date(customFilter.from); from.setHours(0, 0, 0, 0);
+      const to = new Date(customFilter.to); to.setHours(23, 59, 59, 999);
+      return d >= from && d <= to;
+    }
+    if (customFilter.mode === 'days') {
+      return customFilter.dates.some((day) => {
+        const dd = new Date(day); dd.setHours(0, 0, 0, 0);
+        return d.getTime() === dd.getTime();
+      });
+    }
+  }
   const created = new Date(article.createdAt);
   const now = new Date();
   if (range === 'today') {
@@ -97,6 +113,7 @@ export default function AdminDashboard() {
   const [showBatch, setShowBatch] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [delBusy, setDelBusy] = useState(false);
+  const [customFilter, setCustomFilter] = useState(null);
   const [showAllWorkload, setShowAllWorkload] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -125,8 +142,8 @@ export default function AdminDashboard() {
 
   const rangeFiltered = useMemo(() => {
     if (!data) return [];
-    return data.articles.filter((a) => inDateRange(a, dateRange));
-  }, [data, dateRange]);
+    return data.articles.filter((a) => inDateRange(a, dateRange, customFilter));
+  }, [data, dateRange, customFilter]);
 
   const filtered = useMemo(() => {
     const rows = rangeFiltered.filter((a) => {
@@ -168,6 +185,7 @@ export default function AdminDashboard() {
   const doneLabel = dateRange === 'today' ? 'Done today'
     : dateRange === 'week' ? 'Done this week'
     : dateRange === 'month' ? 'Done this month'
+    : dateRange === 'custom' ? 'Done (custom)'
     : 'Done (all time)';
 
   function toggleSort(key) {
@@ -177,6 +195,7 @@ export default function AdminDashboard() {
   async function refresh() {
     setRefreshing(true);
     setDateRange('today');
+    setCustomFilter(null);
     setFilters({ q: '', status: '', writer: '', client: '' });
     try { await loadAll(); toast.success('Dashboard refreshed'); } finally { setRefreshing(false); }
   }
@@ -246,11 +265,16 @@ export default function AdminDashboard() {
             key={r.key}
             type="button"
             className={`date-range-tab ${dateRange === r.key ? 'date-range-tab--active' : ''}`}
-            onClick={() => setDateRange(r.key)}
+            onClick={() => { setDateRange(r.key); setCustomFilter(null); }}
           >
             {r.label}
           </button>
         ))}
+        <DatePickerPopover
+          customFilter={customFilter}
+          onApply={(cf) => { setCustomFilter(cf); setDateRange('custom'); }}
+          onClear={() => { setCustomFilter(null); setDateRange('today'); }}
+        />
       </div>
 
       {/* Stats + by-stage */}

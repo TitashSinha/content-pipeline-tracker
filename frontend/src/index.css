@@ -712,6 +712,53 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .date-range-tab:hover { background: var(--primary-soft); color: var(--text); border-color: var(--primary); }
 .date-range-tab--active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
+/* ---------- Custom date picker ---------- */
+.date-picker-trigger { display: inline-flex; align-items: center; gap: 6px; }
+.date-picker-clear-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%;
+  font-size: .7rem; line-height: 1; color: rgba(255,255,255,.8);
+  transition: color .12s;
+}
+.date-picker-clear-x:hover { color: #fff; }
+.date-picker-wrap { position: relative; }
+.date-picker-popover {
+  position: absolute; top: calc(100% + 8px); left: 0; z-index: 50;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); padding: 14px 14px 12px; min-width: 280px;
+  animation: pop .15s ease;
+}
+.date-picker-modes {
+  display: flex; gap: 4px; margin-bottom: 10px;
+  background: var(--bg); border-radius: var(--radius-sm); padding: 3px;
+}
+.date-picker-mode-btn {
+  flex: 1; padding: 6px 10px; border: none; border-radius: var(--radius-sm);
+  background: none; font-family: inherit; font-size: .82rem; font-weight: 600;
+  color: var(--muted); cursor: pointer; transition: background .12s, color .12s;
+}
+.date-picker-mode-btn--active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.date-picker-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 4px; }
+
+/* Override react-day-picker variables to match our design */
+.rdp-root {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: var(--primary-soft);
+  --rdp-range_start-color: #fff;
+  --rdp-range_end-color: #fff;
+  --rdp-range_middle-background-color: var(--primary-soft);
+  --rdp-selected-border: none;
+  --rdp-font-size: .86rem;
+  --rdp-day-height: 34px;
+  --rdp-day-width: 34px;
+  --rdp-today-color: var(--primary);
+  margin: 0;
+}
+.rdp-root .rdp-day_button { font-family: inherit; border-radius: var(--radius-sm); }
+.rdp-root .rdp-month_caption { font-family: inherit; font-size: .88rem; font-weight: 700; }
+.rdp-root .rdp-weekday { font-family: inherit; font-size: .72rem; color: var(--muted); }
+.rdp-root .rdp-nav button { border-radius: var(--radius-sm); }
+
 /* ---------- TL badge ---------- */
 .tl-badge {
   display: inline-block; margin-left: 8px; font-size: .65rem; font-weight: 800;
