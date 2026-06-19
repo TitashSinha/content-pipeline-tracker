@@ -65,6 +65,9 @@ export const api = {
   deleteArchivedWriter: (id) => request(`/users/archived/${id}`, { method: 'DELETE' }),
   setAvatar: (avatarUrl) => request('/users/me/avatar', { method: 'PUT', body: { avatarUrl } }),
   listTypes: () => request('/article-types'),
+  createType: (name) => request('/article-types', { method: 'POST', body: { name } }),
+  updateType: (id, name) => request(`/article-types/${id}`, { method: 'PUT', body: { name } }),
+  deleteType: (id) => request(`/article-types/${id}`, { method: 'DELETE' }),
 
   // dashboard
   dashboard: () => request('/dashboard'),

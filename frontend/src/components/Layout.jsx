@@ -7,7 +7,7 @@ import { api } from '../api/client.js';
 import {
   IconDashboard, IconContent, IconClients, IconKey,
   IconLogout, IconMenu, IconClose, IconChevronDown, IconUser, IconUsers,
-  IconSearch, IconTL,
+  IconSearch, IconTL, IconTag,
 } from '../lib/icons.jsx';
 
 const NAV = {
@@ -15,6 +15,7 @@ const NAV = {
     { to: '/admin', label: 'Dashboard', Icon: IconDashboard, end: true },
     { to: '/admin/writers', label: 'Writers', Icon: IconUsers },
     { to: '/admin/clients', label: 'Clients', Icon: IconClients },
+    { to: '/admin/content-types', label: 'Content Types', Icon: IconTag },
   ],
   TEAM_LEADER: [
     { to: '/tl', label: 'Dashboard', Icon: IconDashboard, end: true },

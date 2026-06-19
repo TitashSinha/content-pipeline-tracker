@@ -62,6 +62,8 @@ export const IconBatch = (p) => (<Svg {...p}><rect x="3" y="14" width="18" heigh
 export const IconFilter = (p) => (<Svg {...p}><path d="M4 6h16M7 12h10M10 18h4" /></Svg>);
 export const IconTL = (p) => (<Svg {...p}><circle cx="9" cy="8" r="3.5" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0" /><path d="M15 3l2 2 4-4" /></Svg>);
 
+export const IconTag = (p) => (<Svg {...p}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></Svg>);
+
 export const IconSort = ({ dir, ...p }) => (
   <Svg {...p} width="14" height="14">
     {dir === 'asc' ? <path d="m6 15 6-6 6 6" /> : dir === 'desc' ? <path d="m6 9 6 6 6-6" /> : <path d="m8 9 4-4 4 4M8 15l4 4 4-4" opacity="0.5" />}

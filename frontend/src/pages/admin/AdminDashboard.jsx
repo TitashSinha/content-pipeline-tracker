@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import Loader from '../../components/Loader.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
@@ -78,11 +78,20 @@ const csvCell = (v) => {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const toast = useToast();
   const [data, setData] = useState(null);
-  const [dateRange, setDateRange] = useState('today');
-  const [filters, setFilters] = useState({ q: '', status: '', writer: '', client: '' });
-  const [sort, setSort] = useState({ key: 'deadline', dir: 'asc' });
+  const [dateRange, setDateRange] = useState(searchParams.get('range') || 'today');
+  const [filters, setFilters] = useState({
+    q: searchParams.get('q') || '',
+    status: searchParams.get('status') || '',
+    writer: searchParams.get('writer') || '',
+    client: searchParams.get('client') || '',
+  });
+  const [sort, setSort] = useState({
+    key: searchParams.get('sortKey') || 'deadline',
+    dir: searchParams.get('sortDir') || 'asc',
+  });
   const [page, setPage] = useState(1);
   const [formArticle, setFormArticle] = useState(undefined);
   const [showBatch, setShowBatch] = useState(false);
@@ -98,7 +107,21 @@ export default function AdminDashboard() {
     setData({ articles, clients, writers, types, stats });
   }
   useEffect(() => { loadAll(); }, []);
-  useEffect(() => { setPage(1); }, [filters, dateRange]);
+
+  // Persist filter/range/sort in URL so the Back button restores them
+  useEffect(() => {
+    const p = {};
+    if (filters.q) p.q = filters.q;
+    if (filters.status) p.status = filters.status;
+    if (filters.writer) p.writer = filters.writer;
+    if (filters.client) p.client = filters.client;
+    if (dateRange !== 'today') p.range = dateRange;
+    if (sort.key !== 'deadline') p.sortKey = sort.key;
+    if (sort.dir !== 'asc') p.sortDir = sort.dir;
+    setSearchParams(p, { replace: true });
+  }, [filters, dateRange, sort]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { setPage(1); }, [filters, dateRange, sort]);
 
   const rangeFiltered = useMemo(() => {
     if (!data) return [];

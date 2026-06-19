@@ -11,6 +11,7 @@ import ClientsPage from './pages/admin/ClientsPage.jsx';
 import ClientDetailPage from './pages/admin/ClientDetailPage.jsx';
 import WritersPage from './pages/admin/WritersPage.jsx';
 import WriterDetailPage from './pages/admin/WriterDetailPage.jsx';
+import ArticleTypesPage from './pages/admin/ArticleTypesPage.jsx';
 import WriterDashboard from './pages/writer/WriterDashboard.jsx';
 import WriterArticlePage from './pages/writer/WriterArticlePage.jsx';
 import TLDashboard from './pages/tl/TLDashboard.jsx';
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/admin/writers" element={<WritersPage />} />
         <Route path="/admin/clients" element={<ClientsPage />} />
         <Route path="/admin/clients/:id" element={<ClientDetailPage />} />
+        <Route path="/admin/content-types" element={<ArticleTypesPage />} />
       </Route>
 
       {/* Article and writer detail accessible to both ADMIN and TEAM_LEADER */}
