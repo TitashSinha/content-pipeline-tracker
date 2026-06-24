@@ -317,15 +317,8 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .btn svg { width: 17px; height: 17px; }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .55; cursor: not-allowed; }
-.btn--primary { background: var(--primary); color: var(--color-on-primary); box-shadow: var(--shadow-sm); }
-.btn--primary:hover:not(:disabled) { background: var(--primary-dark); }
 .btn--ghost { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
 .btn--ghost:hover:not(:disabled) { background: var(--surface-2); }
-.btn--success { background: var(--color-success-strong); color: #fff; }
-.btn--success:hover:not(:disabled) { filter: brightness(1.06); }
-.btn--danger { background: var(--danger); color: #fff; }
-.btn--danger:hover:not(:disabled) { filter: brightness(.95); }
-.btn--block { width: 100%; }
 .btn--sm { padding: 6px 12px; font-size: .82rem; }
 
 
@@ -430,9 +423,6 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 }
 .overdue-tag--sm { margin-left: 8px; vertical-align: 1px; }
 
-.pagination { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; gap: 12px; flex-wrap: wrap; }
-.pagination-ctrls { display: flex; align-items: center; gap: 10px; }
-.page-indicator { font-size: .82rem; color: var(--muted); }
 
 /* ---------- Badges ---------- */
 .badge {
@@ -441,12 +431,6 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
   transition: background .2s ease, color .2s ease, transform .15s ease;
 }
 .badge--lg { font-size: .82rem; padding: 5px 14px; }
-.badge--draft { background: var(--color-surface-2); color: var(--color-text-secondary); }
-.badge--brief_pending { background: var(--color-info-soft); color: var(--color-info-strong); }
-.badge--writing { background: var(--color-secondary-soft); color: var(--color-primary-hover); }
-.badge--review { background: var(--color-warning-soft); color: var(--color-warning); }
-.badge--completed { background: var(--color-success-soft); color: var(--color-success-strong); }
-.badge--reopened { background: var(--color-info-soft); color: var(--color-info-strong); }
 
 /* ---------- Forms ---------- */
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -711,26 +695,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .timeline-note { margin: 2px 0; font-style: italic; color: var(--text); font-size: .86rem; }
 .timeline-time { font-size: .76rem; color: var(--muted); }
 
-/* ---------- Writer cards ---------- */
-.content-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  box-shadow: var(--shadow-sm); padding: 18px; display: flex; flex-direction: column; gap: 10px;
-  transition: transform .12s, box-shadow .12s; position: relative; overflow: hidden;
-}
-.content-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.content-card--overdue { border-left: 3px solid var(--color-danger); }
-.content-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.content-card-top h3 { font-size: 1rem; line-height: 1.3; }
-.content-card-sub { margin: 0; color: var(--muted); font-size: .84rem; }
-.content-card-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; gap: 8px; }
 .ttw-chip { font-size: .78rem; font-weight: 600; color: var(--primary-dark); background: var(--primary-soft); padding: 3px 10px; border-radius: 999px; }
-.deadline { font-size: .8rem; color: var(--muted); }
-.deadline--over { color: var(--danger); font-weight: 600; }
-
-/* ---------- Empty state ---------- */
-.empty-state { text-align: center; padding: 54px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.empty-mark { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 1.4rem; background: var(--primary-soft); color: var(--primary); margin-bottom: 4px; }
-.empty-state h3 { font-size: 1.05rem; }
 
 /* ---------- Auth ---------- */
 /* One screen-wide wash: navy on the left (the brand panel) easing into the app
@@ -761,12 +726,6 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .brand--light .brand-mark { background: rgba(255, 255, 255, .14); color: #fff; }
 .brand--light .brand-text strong { color: #fff; }
 .brand--light .brand-sub { color: rgba(255, 255, 255, .7); }
-.auth-main { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
-.auth-card { width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 34px; }
-.auth-card h1 { font-size: 1.5rem; margin-bottom: 4px; }
-.auth-form { display: flex; flex-direction: column; gap: 16px; margin-top: 22px; }
-.auth-hint { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-.auth-hint-btns { display: flex; gap: 8px; }
 
 /* ---------- Loader & toast ---------- */
 .loader-full { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
@@ -1332,50 +1291,6 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
    ============================================================ */
 
 /* ---------- Personal metrics row ---------- */
-.metric-row {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px;
-  margin-bottom: 8px;
-}
-.metric-card {
-  display: flex; flex-direction: column; gap: 2px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 18px;
-}
-.metric-value { font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
-.metric-label { font-size: .82rem; color: var(--muted); font-weight: 600; }
-.metric-sub { font-size: .74rem; color: var(--muted); margin-top: 2px; }
-.metric-card--warn { border-color: var(--color-warning-border); background: var(--color-warning-soft); }
-.metric-card--warn .metric-value { color: var(--color-warning); }
-
-/* ---------- Today's Focus ---------- */
-.focus-panel {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow-sm);
-  padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;
-}
-.focus-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.focus-estimate { font-size: .82rem; font-weight: 600; color: var(--primary-dark); background: var(--primary-soft); padding: 4px 11px; border-radius: 999px; }
-.focus-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.focus-item { display: flex; align-items: center; gap: 12px; }
-.focus-rank {
-  flex-shrink: 0; width: 24px; height: 24px; display: grid; place-items: center;
-  border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark);
-  font-size: .8rem; font-weight: 700;
-}
-.focus-link {
-  flex: 1; display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--surface-2); transition: border-color .15s, background .15s, transform .05s;
-}
-.focus-link:hover { border-color: var(--border-strong); background: var(--surface); }
-.focus-link:active { transform: translateY(1px); }
-.focus-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.focus-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.focus-sub { font-size: .78rem; color: var(--muted); }
-.focus-when { font-size: .78rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
-.focus-when--today { color: var(--color-warning); }
-.focus-when--over { color: var(--danger); }
-.focus-arrow { width: 16px; height: 16px; color: var(--muted); flex-shrink: 0; }
 
 /* ---------- Writing session (pause / resume) ---------- */
 .writing-session { display: flex; align-items: center; justify-content: space-between; gap: 16px; }

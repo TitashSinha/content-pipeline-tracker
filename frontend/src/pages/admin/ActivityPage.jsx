@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import { initials, formatDateTime } from '../../lib/utils.js';
 import { STATUS_LABELS } from '../../lib/workflow.js';
@@ -82,7 +82,7 @@ export default function ActivityPage() {
       </div>
 
       {events == null ? (
-        <Loader />
+        <SkeletonPage />
       ) : events.length === 0 ? (
         <EmptyState title="No matching activity" message="Try a different filter, or clear them to see everything." />
       ) : (
