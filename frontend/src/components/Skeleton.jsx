@@ -35,6 +35,41 @@ export function SkeletonPage() {
   );
 }
 
+// Replaces <Loader full /> on detail / single-record pages (article, writer, client).
+export function SkeletonDetail() {
+  return (
+    <div className="skeleton-page" aria-busy="true" aria-label="Loading…">
+      <div className="flex items-center gap-3 mb-6">
+        <SkeletonBar className="h-7 w-56 rounded-lg" />
+        <SkeletonBar className="h-6 w-20 rounded-full" />
+      </div>
+      <div className="skeleton-card p-5 flex flex-col gap-5 mb-5">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex flex-col gap-1.5">
+              <SkeletonBar className="h-3 w-20 rounded" />
+              <SkeletonBar className="h-9 rounded-lg w-full" />
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <SkeletonBar className="h-3 w-16 rounded" />
+          <SkeletonBar className="h-20 rounded-lg w-full" />
+        </div>
+      </div>
+      <div className="skeleton-card p-0 overflow-hidden">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-5 py-[14px] border-b border-border last:border-0">
+            <SkeletonBar className="size-7 rounded-full flex-shrink-0" />
+            <SkeletonBar className="h-4 flex-1 rounded" />
+            <SkeletonBar className="h-4 w-20 rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Lightweight inline skeleton for smaller sections
 export function SkeletonRows({ count = 4 }) {
   return (

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import StatusBadge from '../../components/StatusBadge.jsx';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import { Button, LinkButton } from '../../components/ui/index.js';
 import { cn } from '../../components/ui/cn.js';
@@ -115,7 +115,7 @@ export default function WriterDashboard() {
   }
   useEffect(() => { load(); }, []);
 
-  if (!articles) return <Loader full />;
+  if (!articles) return <div className="page"><SkeletonPage /></div>;
 
   const now = new Date();
   const todayStr = now.toDateString();

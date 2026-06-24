@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonDetail } from '../../components/Skeleton.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import ClientForm from '../../components/admin/ClientForm.jsx';
 import ArticleForm from '../../components/admin/ArticleForm.jsx';
@@ -65,7 +65,7 @@ export default function ClientDetailPage() {
   );
 
   if (error) return <div className="page"><p className="form-error">{error}</p></div>;
-  if (!client) return <Loader full />;
+  if (!client) return <div className="page"><SkeletonDetail /></div>;
 
   return (
     <div className="page">

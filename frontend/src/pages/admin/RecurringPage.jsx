@@ -1,9 +1,9 @@
-// FEATURE: Recurring Content (Phase 6) — manage recurrence rules that auto-spawn
+﻿// FEATURE: Recurring Content (Phase 6) — manage recurrence rules that auto-spawn
 // content on a cadence. Mirrors TemplatesPage. "Run now" spawns one immediately;
 // the active toggle pauses/resumes automatic generation.
 import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import RecurringForm from '../../components/admin/RecurringForm.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
@@ -77,7 +77,7 @@ export default function RecurringPage() {
     }
   }
 
-  if (!recurrences) return <Loader full />;
+  if (!recurrences) return <div className="page"><SkeletonPage /></div>;
 
   return (
     <div className="page">

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonDetail } from '../../components/Skeleton.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import Avatar from '../../components/Avatar.jsx';
 import WriterForm from '../../components/admin/WriterForm.jsx';
@@ -35,7 +35,7 @@ export default function WriterDetailPage() {
   }, [id]);
 
   if (error) return <div className="page"><p className="form-error">{error}</p></div>;
-  if (!writer) return <Loader full />;
+  if (!writer) return <div className="page"><SkeletonDetail /></div>;
 
   return (
     <div className="page">

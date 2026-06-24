@@ -1,10 +1,10 @@
-// FEATURE: Team Leader Workspace (Phase 4) — the TL's command center for running
+﻿// FEATURE: Team Leader Workspace (Phase 4) — the TL's command center for running
 // their team. Everything is derived (frontend) from the article + writer lists
 // via the shared lib/risk.js helpers; no per-widget endpoints.
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import { Card, LinkButton } from '../../components/ui/index.js';
@@ -69,7 +69,7 @@ export default function TLTeam() {
     };
   }, [data]);
 
-  if (!view) return <Loader full />;
+  if (!view) return <div className="page"><SkeletonPage /></div>;
 
   const { risks, waiting, stages, capacity, days, availability, activeTotal, overdueTotal } = view;
   const maxStageCount = Math.max(1, ...stages.map((s) => s.count));

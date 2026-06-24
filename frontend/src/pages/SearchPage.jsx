@@ -1,4 +1,4 @@
-// FEATURE: Advanced search (Phase 7). A faceted, full-text search over the content
+﻿// FEATURE: Advanced search (Phase 7). A faceted, full-text search over the content
 // the signed-in user can see (the role-scoped article list already enforces
 // visibility). Searches title + brief notes + client/writer/type, with status /
 // writer / client / type facets. Reachable from the command palette.
@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import Loader from '../components/Loader.jsx';
+import { SkeletonPage } from '../components/Skeleton.jsx';
 import EmptyState from '../components/EmptyState.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import { Card } from '../components/ui/index.js';
@@ -52,7 +52,7 @@ export default function SearchPage() {
     );
   }, [data, q, status, writerId, clientId]);
 
-  if (!data) return <Loader full />;
+  if (!data) return <div className="page"><SkeletonPage /></div>;
   const isAdmin = user.role === 'ADMIN' || user.role === 'TEAM_LEADER';
   const hasFilters = q.trim() || status || writerId || clientId;
 

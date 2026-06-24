@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { Button, IconButton, Card } from '../../components/ui/index.js';
 import { IconEdit, IconTrash, IconPlus } from '../../lib/icons.jsx';
@@ -67,7 +67,7 @@ export default function ArticleTypesPage() {
     }
   }
 
-  if (!types) return <Loader full />;
+  if (!types) return <div className="page"><SkeletonPage /></div>;
 
   return (
     <div className="page">

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import TemplateForm from '../../components/admin/TemplateForm.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
@@ -40,7 +40,7 @@ export default function TemplatesPage() {
     }
   }
 
-  if (!templates) return <Loader full />;
+  if (!templates) return <div className="page"><SkeletonPage /></div>;
 
   return (
     <div className="page">

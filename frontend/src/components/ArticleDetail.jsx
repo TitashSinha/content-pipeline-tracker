@@ -10,6 +10,7 @@ import { useToast } from './Toast.jsx';
 import { Button, Card, CardTitle } from './ui/index.js';
 import { formatDate, formatTTW, formatDateTime, ttwDisplay, isOverdue } from '../lib/utils.js';
 import { getStatusActions } from '../lib/workflow.js';
+import { fireConfetti } from '../lib/confetti.js';
 import { IconArrowLeft, IconArrowRight, IconExternal, IconCheck, IconPause, IconPlay, IconNote, IconEye, IconEyeOff } from '../lib/icons.jsx';
 
 function Meta({ label, value, danger }) {
@@ -63,6 +64,7 @@ export default function ArticleDetail({ article, role, onChange, backTo, backLab
       const updated = await api.setStatus(article.id, to, note);
       setNote('');
       onChange(updated);
+      if (to === 'COMPLETED') fireConfetti();
       toast.success('Status updated');
     } catch (err) {
       toast.error(err.message);

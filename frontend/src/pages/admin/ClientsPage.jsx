@@ -1,7 +1,7 @@
-import { useEffect, useState, useMemo } from 'react';
+﻿import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import ClientForm from '../../components/admin/ClientForm.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
@@ -46,7 +46,7 @@ export default function ClientsPage() {
     }
   }
 
-  if (!clients) return <Loader full />;
+  if (!clients) return <div className="page"><SkeletonPage /></div>;
 
   const displayed = q
     ? clients.filter((c) =>

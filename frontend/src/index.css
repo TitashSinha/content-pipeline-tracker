@@ -438,6 +438,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .badge {
   display: inline-flex; align-items: center; font-weight: 600; font-size: .76rem;
   padding: 3px 11px; border-radius: 999px; white-space: nowrap;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
 }
 .badge--lg { font-size: .82rem; padding: 5px 14px; }
 .badge--draft { background: var(--color-surface-2); color: var(--color-text-secondary); }
@@ -460,6 +461,21 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .field--full { grid-column: 1 / -1; }
 .stack { display: flex; flex-direction: column; gap: 16px; }
 .form-error { color: var(--danger); font-size: .85rem; background: var(--danger-soft); padding: 8px 12px; border-radius: var(--radius-sm); margin: 0; }
+
+/* Form validation — error state + shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  18%       { transform: translateX(-7px); }
+  36%       { transform: translateX(6px); }
+  54%       { transform: translateX(-4px); }
+  72%       { transform: translateX(3px); }
+}
+.form--shaking { animation: shake .38s cubic-bezier(.36,.07,.19,.97) both; }
+.field--error input, .field--error select, .field--error textarea {
+  border-color: var(--danger); background: var(--danger-soft);
+}
+.field-hint { font-size: .77rem; margin-top: 2px; }
+.field-hint--error { color: var(--danger); font-weight: 600; }
 .saved-hint { display: flex; align-items: center; gap: 5px; color: var(--color-success-strong); font-size: .82rem; margin: 8px 0 0; }
 .saved-hint svg { width: 15px; height: 15px; }
 
@@ -677,7 +693,13 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 
 /* ---------- Timeline ---------- */
 .timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.timeline-item { display: flex; gap: 12px; padding: 6px 0; }
+.timeline-item { display: flex; gap: 12px; padding: 6px 0; animation: fadeUp .2s ease both; }
+.timeline-item:nth-child(1) { animation-delay: .03s; }
+.timeline-item:nth-child(2) { animation-delay: .07s; }
+.timeline-item:nth-child(3) { animation-delay: .11s; }
+.timeline-item:nth-child(4) { animation-delay: .15s; }
+.timeline-item:nth-child(5) { animation-delay: .19s; }
+.timeline-item:nth-child(6) { animation-delay: .23s; }
 .timeline-avatar {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
   font-size: .68rem; font-weight: 700; background: var(--primary-soft); color: var(--primary-dark);

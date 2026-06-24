@@ -68,9 +68,11 @@ export default function ArticleForm({ article, clients, writers, types, articles
   })();
 
   const [form, setForm] = useState(initial);
+  const [errors, setErrors] = useState({});
+  const [shaking, setShaking] = useState(false);
   const initialJson = useRef(JSON.stringify(initial));
   const dirty = JSON.stringify(form) !== initialJson.current;
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setErrors((err) => { const n = { ...err }; delete n[k]; return n; }); };
 
   function onPickTemplate(e) {
     const id = e.target.value;
@@ -94,14 +96,22 @@ export default function ArticleForm({ article, clients, writers, types, articles
     const clientId = e.target.value;
     const client = clients.find((c) => String(c.id) === String(clientId));
     setForm((f) => (editing ? { ...f, clientId } : fillFromClient({ ...f, clientId }, client, templates)));
+    setErrors((err) => { const n = { ...err }; delete n.clientId; return n; });
   }
 
   async function submit(e, asDraft = false) {
     e.preventDefault();
-    if (!form.title || !form.clientId || !form.articleTypeId || !form.assignedWriterId) {
-      toast.error('Title, client, type and writer are required');
+    const missing = {};
+    if (!form.title) missing.title = true;
+    if (!form.clientId) missing.clientId = true;
+    if (!form.articleTypeId) missing.articleTypeId = true;
+    if (!form.assignedWriterId) missing.assignedWriterId = true;
+    if (Object.keys(missing).length > 0) {
+      setErrors(missing);
+      setShaking(true);
       return;
     }
+    setErrors({});
     setBusy(true);
     try {
       const payload = {
@@ -212,29 +222,37 @@ export default function ArticleForm({ article, clients, writers, types, articles
         </div>
       )}
 
-      <form id="article-form" className="form-grid" onSubmit={submit}>
-        <label className="field field--full">
+      <form
+        id="article-form"
+        className={`form-grid${shaking ? ' form--shaking' : ''}`}
+        onAnimationEnd={() => setShaking(false)}
+        onSubmit={submit}
+      >
+        <label className={`field field--full${errors.title ? ' field--error' : ''}`}>
           <span>Title *</span>
           <input value={form.title} onChange={set('title')} placeholder="e.g. How to Scale Your Content Strategy" />
+          {errors.title && <span className="field-hint field-hint--error">Required</span>}
         </label>
 
-        <label className="field">
+        <label className={`field${errors.clientId ? ' field--error' : ''}`}>
           <span>Client *</span>
           <select value={form.clientId} onChange={onClientChange}>
             <option value="">Select…</option>
             {clients.map((c) => <option key={c.id} value={c.id}>{c.name}{c.contentTypeName ? ` · ${c.contentTypeName}` : ''}</option>)}
           </select>
+          {errors.clientId && <span className="field-hint field-hint--error">Required</span>}
         </label>
 
-        <label className="field">
+        <label className={`field${errors.articleTypeId ? ' field--error' : ''}`}>
           <span>Content type *</span>
           <select value={form.articleTypeId} onChange={set('articleTypeId')}>
             <option value="">Select…</option>
             {types.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
+          {errors.articleTypeId && <span className="field-hint field-hint--error">Required</span>}
         </label>
 
-        <label className="field">
+        <label className={`field${errors.assignedWriterId ? ' field--error' : ''}`}>
           <span>Assign to *</span>
           <select value={form.assignedWriterId} onChange={set('assignedWriterId')}>
             <option value="">Select…</option>
@@ -262,6 +280,7 @@ export default function ArticleForm({ article, clients, writers, types, articles
               ))}
             </div>
           )}
+          {errors.assignedWriterId && <span className="field-hint field-hint--error">Required</span>}
         </label>
 
         <label className="field">

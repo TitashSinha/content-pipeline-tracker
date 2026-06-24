@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import { formatDate, ttwDisplay, isOverdue } from '../../lib/utils.js';
@@ -20,7 +20,7 @@ export default function TLMyContent() {
     }).catch(() => setArticles([]));
   }, [user.id]);
 
-  if (!articles) return <Loader full />;
+  if (!articles) return <div className="page"><SkeletonPage /></div>;
 
   return (
     <div className="page">
