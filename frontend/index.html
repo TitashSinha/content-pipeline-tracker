@@ -6,8 +6,18 @@
     <title>Content Pipeline · Lexiconn</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23657166'/%3E%3Cpath d='M9 21l2-6 8-8 4 4-8 8-6 2z' fill='none' stroke='%23FDE8D3' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23001D39'/%3E%3Cpath d='M9 21l2-6 8-8 4 4-8 8-6 2z' fill='none' stroke='%237BBDE8' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E"
     />
+    <!-- Apply the stored theme before first paint to avoid a flash (see lib/theme.js). -->
+    <script>
+      (function () {
+        try {
+          var p = localStorage.getItem('cpt_theme') || 'system';
+          var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

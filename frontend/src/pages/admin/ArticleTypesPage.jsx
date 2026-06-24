@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
 import Loader from '../../components/Loader.jsx';
 import { useToast } from '../../components/Toast.jsx';
+import { Button, IconButton, Card } from '../../components/ui/index.js';
 import { IconEdit, IconTrash, IconPlus } from '../../lib/icons.jsx';
 
 export default function ArticleTypesPage() {
@@ -73,11 +74,11 @@ export default function ArticleTypesPage() {
       <div className="page-head">
         <div>
           <h1>Content Types</h1>
-          <p className="muted">{types.length} type{types.length === 1 ? '' : 's'}</p>
+          <p className="text-muted">{types.length} type{types.length === 1 ? '' : 's'}</p>
         </div>
       </div>
 
-      <div className="card no-pad">
+      <Card noPad>
         <table className="table">
           <thead>
             <tr>
@@ -89,9 +90,7 @@ export default function ArticleTypesPage() {
           <tbody>
             {types.length === 0 && (
               <tr>
-                <td colSpan={3} className="muted" style={{ padding: '24px', textAlign: 'center' }}>
-                  No types yet — add one below.
-                </td>
+                <td colSpan={3} className="text-muted text-center p-6">No types yet — add one below.</td>
               </tr>
             )}
             {types.map((t) => {
@@ -99,7 +98,7 @@ export default function ArticleTypesPage() {
               const isEditing = editingId === t.id;
               return (
                 <tr key={t.id}>
-                  <td className="cell-strong">
+                  <td className="font-semibold">
                     {isEditing ? (
                       <input
                         className="inline-rename-input"
@@ -116,46 +115,30 @@ export default function ArticleTypesPage() {
                   <td>
                     {count > 0
                       ? `${count} article${count === 1 ? '' : 's'}`
-                      : <span className="muted">—</span>}
+                      : <span className="text-muted">—</span>}
                   </td>
                   <td className="col-actions">
                     {isEditing ? (
                       <>
-                        <button
-                          type="button"
-                          className="btn btn--primary btn--sm"
-                          disabled={busy || !editName.trim()}
-                          onClick={() => saveRename(t.id)}
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn--ghost btn--sm"
-                          onClick={() => setEditingId(null)}
-                        >
-                          Cancel
-                        </button>
+                        <Button size="sm" disabled={busy || !editName.trim()} onClick={() => saveRename(t.id)}>Save</Button>
+                        <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>Cancel</Button>
                       </>
                     ) : (
                       <>
-                        <button
-                          type="button"
-                          className="icon-btn"
+                        <IconButton
                           title="Rename"
                           onClick={() => { setEditingId(t.id); setEditName(t.name); }}
                         >
                           <IconEdit />
-                        </button>
-                        <button
-                          type="button"
-                          className="icon-btn icon-btn--danger"
+                        </IconButton>
+                        <IconButton
+                          tone="danger"
                           title={count > 0 ? `Used by ${count} article${count === 1 ? '' : 's'} — cannot delete` : 'Delete'}
                           disabled={count > 0 || busy}
                           onClick={() => handleDelete(t.id)}
                         >
                           <IconTrash />
-                        </button>
+                        </IconButton>
                       </>
                     )}
                   </td>
@@ -171,11 +154,11 @@ export default function ArticleTypesPage() {
             onChange={(e) => setNewName(e.target.value)}
             placeholder="New type name…"
           />
-          <button type="submit" className="btn btn--primary btn--sm" disabled={busy || !newName.trim()}>
+          <Button size="sm" disabled={busy || !newName.trim()}>
             <IconPlus /> Add
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

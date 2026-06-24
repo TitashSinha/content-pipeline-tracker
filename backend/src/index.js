@@ -4,21 +4,30 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
-import { load } from './db.js';
+import { load, getDB } from './db.js';
 import { seedIfEmpty } from './seed.js';
+import { sweepRecurrences } from './recurrence.js';
 import authRoutes from './routes/auth.routes.js';
 import articleRoutes from './routes/articles.routes.js';
 import clientRoutes from './routes/clients.routes.js';
 import userRoutes from './routes/users.routes.js';
 import articleTypeRoutes from './routes/articleTypes.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
+import analyticsRoutes from './routes/analytics.routes.js';
+import recurrenceRoutes from './routes/recurrences.routes.js';
+import notificationRoutes from './routes/notifications.routes.js';
+import commentRoutes from './routes/comments.routes.js';
+import followRoutes from './routes/follows.routes.js';
+import activityRoutes from './routes/activity.routes.js';
 import quoteRoutes from './routes/quote.routes.js';
 import searchRoutes from './routes/search.routes.js';
+import templateRoutes from './routes/templates.routes.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 load();
 seedIfEmpty();
+sweepRecurrences(getDB()); // catch up any recurring content due while we were down
 
 const app = express();
 app.use(cors());
@@ -31,8 +40,15 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/article-types', articleTypeRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/recurrences', recurrenceRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/follows', followRoutes);
+app.use('/api/activity', activityRoutes);
 app.use('/api/quote', quoteRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/templates', templateRoutes);
 
 // In production, serve the built frontend from the same server.
 const dist = join(__dirname, '..', '..', 'frontend', 'dist');

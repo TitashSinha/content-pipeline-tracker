@@ -7,6 +7,8 @@ import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
 import WriterForm from '../../components/admin/WriterForm.jsx';
 import BatchAssignModal from '../../components/admin/BatchAssignModal.jsx';
 import { useToast } from '../../components/Toast.jsx';
+import { Button, IconButton, Card, CardTitle } from '../../components/ui/index.js';
+import { cn } from '../../components/ui/cn.js';
 import { formatDate } from '../../lib/utils.js';
 import { IconPlus, IconEdit, IconTrash, IconBatch, IconSearch } from '../../lib/icons.jsx';
 
@@ -60,7 +62,7 @@ export default function WritersPage() {
 
   async function openEdit(w) {
     try {
-      setEditing(await api.getWriter(w.id)); // fetch full profile so the form prefills everything
+      setEditing(await api.getWriter(w.id));
     } catch (err) {
       toast.error(err.message);
     }
@@ -94,22 +96,35 @@ export default function WritersPage() {
       <div className="page-head">
         <div>
           <h1>People</h1>
-          <p className="muted">{writers.length} active · {archived.length} in bin</p>
+          <p className="text-muted">{writers.length} active · {archived.length} in bin</p>
         </div>
-        <button type="button" className="btn btn--primary" onClick={() => setEditing(null)}>
+        <Button onClick={() => setEditing(null)}>
           <IconPlus /> Add writer
-        </button>
+        </Button>
       </div>
 
-      <div className="role-tabs">
+      {/* Role filter tabs */}
+      <div className="flex gap-1 border-b border-border -mb-[1px]">
         {ROLE_TABS.map((t) => (
           <button
             key={t.key}
             type="button"
-            className={`role-tab${tab === t.key ? ' role-tab--active' : ''}`}
+            className={cn(
+              'flex items-center gap-1.5 px-[14px] py-2 border-b-2 text-[.875rem] cursor-pointer bg-transparent',
+              'transition-[color,border-color] duration-100 -mb-px',
+              tab === t.key
+                ? 'text-primary border-primary font-semibold'
+                : 'text-muted border-transparent hover:text-ink',
+            )}
             onClick={() => { setTab(t.key); setQ(''); }}
           >
-            {t.label} <span className="role-tab-count">{t.count}</span>
+            {t.label}
+            <span className={cn(
+              'text-[.72rem] font-bold rounded-full px-[7px] py-px',
+              tab === t.key ? 'text-primary bg-primary-soft' : 'text-muted bg-surface-2',
+            )}>
+              {t.count}
+            </span>
           </button>
         ))}
       </div>
@@ -118,21 +133,21 @@ export default function WritersPage() {
         archived.length === 0 ? (
           <EmptyState title="Bin is empty" message="Archived writers will appear here." />
         ) : (
-          <div className="card">
-            <h2 className="card-title">Archived writers</h2>
+          <Card>
+            <CardTitle as="h2">Archived writers</CardTitle>
             {archived.map((w) => (
               <div key={w.id} className="bin-row">
                 <div>
-                  <strong>{w.name}</strong> <span className="muted">· {w.email}</span>
-                  <div className="muted tiny">Removed {formatDate(w.archivedAt)}</div>
+                  <strong>{w.name}</strong> <span className="text-muted">· {w.email}</span>
+                  <div className="text-muted text-[.8rem]">Removed {formatDate(w.archivedAt)}</div>
                 </div>
                 <div className="bin-actions">
-                  <button type="button" className="btn btn--ghost btn--sm" onClick={() => restore(w.id)}>Restore</button>
-                  <button type="button" className="btn btn--danger btn--sm" onClick={() => purge(w.id)}>Delete</button>
+                  <Button variant="ghost" size="sm" onClick={() => restore(w.id)}>Restore</Button>
+                  <Button variant="danger" size="sm" onClick={() => purge(w.id)}>Delete</Button>
                 </div>
               </div>
             ))}
-          </div>
+          </Card>
         )
       ) : writers.length === 0 ? (
         <EmptyState title="No writers yet" message="Add your first writer so you can assign content to them." />
@@ -142,32 +157,32 @@ export default function WritersPage() {
             <IconSearch />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name, email or specialty…" />
           </div>
-          <div className="card no-pad">
+          <Card noPad>
             <table className="table">
               <thead><tr><th>Name</th><th>Email</th><th>Specialties</th><th>Articles</th><th aria-label="Actions" /></tr></thead>
               <tbody>
                 {displayed.length === 0 && (
-                  <tr><td colSpan={5} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No people match "{q}"</td></tr>
+                  <tr><td colSpan={5} className="text-muted text-center p-6">No people match "{q}"</td></tr>
                 )}
                 {displayed.map((w) => (
-                  <tr key={w.id} className="row-link" onClick={() => navigate(`/admin/writers/${w.id}`)}>
-                    <td className="cell-strong">
+                  <tr key={w.id} className="cursor-pointer transition-colors hover:bg-surface-2" onClick={() => navigate(`/admin/writers/${w.id}`)}>
+                    <td className="font-semibold">
                       {w.name}
                       {w.role === 'TEAM_LEADER' && <span className="tl-badge">TL</span>}
                     </td>
-                    <td className="muted">{w.email}</td>
-                    <td className="muted">{w.specialties ?? '—'}</td>
+                    <td className="text-muted">{w.email}</td>
+                    <td className="text-muted">{w.specialties ?? '—'}</td>
                     <td>{counts[w.id] || 0}</td>
                     <td className="col-actions" onClick={(e) => e.stopPropagation()}>
-                      <button type="button" className="icon-btn" title="Batch assign" onClick={() => setBatchWriter(w)}><IconBatch /></button>
-                      <button type="button" className="icon-btn" title="Edit" onClick={() => openEdit(w)}><IconEdit /></button>
-                      <button type="button" className="icon-btn icon-btn--danger" title="Remove writer" onClick={() => setRemoving({ ...w, count: counts[w.id] || 0 })}><IconTrash /></button>
+                      <IconButton title="Batch assign" onClick={() => setBatchWriter(w)}><IconBatch /></IconButton>
+                      <IconButton title="Edit" onClick={() => openEdit(w)}><IconEdit /></IconButton>
+                      <IconButton tone="danger" title="Remove writer" onClick={() => setRemoving({ ...w, count: counts[w.id] || 0 })}><IconTrash /></IconButton>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         </>
       )}
 
@@ -196,7 +211,7 @@ export default function WritersPage() {
           confirmLabel="Remove"
           message={
             `Remove ${removing.name}? Their ${removing.count} assigned article${removing.count === 1 ? '' : 's'} ` +
-            `will show as “Unknown Writer” until you reassign them. You can restore the writer from the bin.`
+            `will show as "Unknown Writer" until you reassign them. You can restore the writer from the bin.`
           }
           busy={busy}
           onCancel={() => setRemoving(null)}

@@ -15,7 +15,7 @@ router.get('/', authRequired, (req, res) => {
   const articles = (
     isPrivileged
       ? db.articles
-      : db.articles.filter((a) => a.assignedWriterId === req.user.id)
+      : db.articles.filter((a) => a.assignedWriterId === req.user.id && a.status !== 'DRAFT')
   )
     .filter((a) => a.title.toLowerCase().includes(q))
     .slice(0, 6)

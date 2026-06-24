@@ -6,6 +6,7 @@ import EmptyState from '../../components/EmptyState.jsx';
 import ClientForm from '../../components/admin/ClientForm.jsx';
 import ConfirmDialog from '../../components/admin/ConfirmDialog.jsx';
 import { useToast } from '../../components/Toast.jsx';
+import { Button, IconButton, Card } from '../../components/ui/index.js';
 import { IconPlus, IconEdit, IconTrash, IconSearch } from '../../lib/icons.jsx';
 
 export default function ClientsPage() {
@@ -13,15 +14,21 @@ export default function ClientsPage() {
   const toast = useToast();
   const [clients, setClients] = useState(null);
   const [types, setTypes] = useState([]);
+  const [writers, setWriters] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [editing, setEditing] = useState(undefined); // undefined=closed, null=new, obj=edit
   const [deleting, setDeleting] = useState(null);
   const [delBusy, setDelBusy] = useState(false);
   const [q, setQ] = useState('');
 
   async function load() {
-    const [c, t] = await Promise.all([api.listClients(), api.listTypes()]);
+    const [c, t, w, tpl] = await Promise.all([
+      api.listClients(), api.listTypes(), api.listWriters(), api.listTemplates(),
+    ]);
     setClients(c);
     setTypes(t);
+    setWriters(w);
+    setTemplates(tpl);
   }
   useEffect(() => { load(); }, []);
 
@@ -54,11 +61,11 @@ export default function ClientsPage() {
       <div className="page-head">
         <div>
           <h1>Clients</h1>
-          <p className="muted">{clients.length} client{clients.length === 1 ? '' : 's'}</p>
+          <p className="text-muted">{clients.length} client{clients.length === 1 ? '' : 's'}</p>
         </div>
-        <button type="button" className="btn btn--primary" onClick={() => setEditing(null)}>
+        <Button onClick={() => setEditing(null)}>
           <IconPlus /> Add client
-        </button>
+        </Button>
       </div>
 
       {clients.length === 0 ? (
@@ -69,27 +76,27 @@ export default function ClientsPage() {
             <IconSearch />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by name, industry or type…" />
           </div>
-          <div className="card no-pad">
-          <table className="table">
-            <thead><tr><th>Name</th><th>Content type</th><th>Industry</th><th aria-label="Actions" /></tr></thead>
-            <tbody>
-              {displayed.length === 0 && (
-                <tr><td colSpan={4} className="muted" style={{ padding: '24px', textAlign: 'center' }}>No clients match "{q}"</td></tr>
-              )}
-              {displayed.map((c) => (
-                <tr key={c.id} className="row-link" onClick={() => navigate(`/admin/clients/${c.id}`)}>
-                  <td className="cell-strong">{c.name}</td>
-                  <td>{c.contentTypeName ?? '—'}</td>
-                  <td className="muted">{c.industry ?? '—'}</td>
-                  <td className="col-actions" onClick={(e) => e.stopPropagation()}>
-                    <button type="button" className="icon-btn" title="Edit" onClick={() => setEditing(c)}><IconEdit /></button>
-                    <button type="button" className="icon-btn icon-btn--danger" title="Delete" onClick={() => setDeleting(c)}><IconTrash /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          <Card noPad>
+            <table className="table">
+              <thead><tr><th>Name</th><th>Content type</th><th>Industry</th><th aria-label="Actions" /></tr></thead>
+              <tbody>
+                {displayed.length === 0 && (
+                  <tr><td colSpan={4} className="text-muted text-center p-6">No clients match "{q}"</td></tr>
+                )}
+                {displayed.map((c) => (
+                  <tr key={c.id} className="cursor-pointer transition-colors hover:bg-surface-2" onClick={() => navigate(`/admin/clients/${c.id}`)}>
+                    <td className="font-semibold">{c.name}</td>
+                    <td>{c.contentTypeName ?? '—'}</td>
+                    <td className="text-muted">{c.industry ?? '—'}</td>
+                    <td className="col-actions" onClick={(e) => e.stopPropagation()}>
+                      <IconButton title="Edit" onClick={() => setEditing(c)}><IconEdit /></IconButton>
+                      <IconButton tone="danger" title="Delete" onClick={() => setDeleting(c)}><IconTrash /></IconButton>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
         </>
       )}
 
@@ -97,6 +104,8 @@ export default function ClientsPage() {
         <ClientForm
           client={editing}
           types={types}
+          writers={writers}
+          templates={templates}
           onClose={() => setEditing(undefined)}
           onSaved={() => { setEditing(undefined); load(); }}
         />
@@ -105,7 +114,7 @@ export default function ClientsPage() {
       {deleting && (
         <ConfirmDialog
           title="Delete client"
-          message={`Are you sure you want to delete “${deleting.name}${deleting.contentTypeName ? ` · ${deleting.contentTypeName}` : ''}”? This can't be undone.`}
+          message={`Are you sure you want to delete "${deleting.name}${deleting.contentTypeName ? ` · ${deleting.contentTypeName}` : ''}"? This can't be undone.`}
           busy={delBusy}
           onCancel={() => setDeleting(null)}
           onConfirm={confirmDelete}

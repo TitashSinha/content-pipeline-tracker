@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Modal from '../Modal.jsx';
 import LinkInputs from '../LinkInputs.jsx';
 import { api } from '../../api/client.js';
 import { useToast } from '../Toast.jsx';
+import { Button } from '../ui/index.js';
 
 const toDateInput = (iso) => (iso ? new Date(iso).toISOString().slice(0, 10) : '');
 
-export default function ClientForm({ client, types, onClose, onSaved }) {
+export default function ClientForm({ client, types, writers = [], templates = [], onClose, onSaved }) {
   const editing = !!client;
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({
+  const initial = {
     name: client?.name || '',
     contentTypeId: client?.contentTypeId || '',
     industry: client?.industry || '',
@@ -21,7 +22,14 @@ export default function ClientForm({ client, types, onClose, onSaved }) {
     pilotDate: toDateInput(client?.pilotDate),
     pilotNotes: client?.pilotNotes || '',
     notes: client?.notes || '',
-  });
+    defaultWriterId: client?.defaultWriterId || '',
+    defaultWordCount: client?.defaultWordCount ?? '',
+    defaultTtwMinutes: client?.defaultTtwMinutes ?? '',
+    defaultTemplateId: client?.defaultTemplateId || '',
+  };
+  const [form, setForm] = useState(initial);
+  const initialJson = useRef(JSON.stringify(initial));
+  const dirty = JSON.stringify(form) !== initialJson.current;
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function submit(e) {
@@ -53,14 +61,15 @@ export default function ClientForm({ client, types, onClose, onSaved }) {
   return (
     <Modal
       wide
+      dirty={dirty}
       title={editing ? 'Edit client' : 'Add client'}
       onClose={onClose}
       footer={
         <>
-          <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>Cancel</button>
-          <button type="submit" form="client-form" className="btn btn--primary" disabled={busy}>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button type="submit" form="client-form" disabled={busy}>
             {busy ? 'Saving…' : 'Save'}
-          </button>
+          </Button>
         </>
       }
     >
@@ -87,6 +96,35 @@ export default function ClientForm({ client, types, onClose, onSaved }) {
         <label className="field field--full">
           <span>Competitors</span>
           <input value={form.competitors} onChange={set('competitors')} placeholder="Comma-separated, optional" />
+        </label>
+
+        <p className="field--full form-subhead">Defaults for new content — pre-fill the assignment form for this client.</p>
+        <label className="field">
+          <span>Preferred writer</span>
+          <select value={form.defaultWriterId} onChange={set('defaultWriterId')}>
+            <option value="">No default</option>
+            <optgroup label="Team Leaders">
+              {writers.filter((w) => w.role === 'TEAM_LEADER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+            </optgroup>
+            <optgroup label="Writers">
+              {writers.filter((w) => w.role === 'WRITER').map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+            </optgroup>
+          </select>
+        </label>
+        <label className="field">
+          <span>Default template</span>
+          <select value={form.defaultTemplateId} onChange={set('defaultTemplateId')}>
+            <option value="">No default</option>
+            {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </select>
+        </label>
+        <label className="field">
+          <span>Default word count</span>
+          <input type="number" min="0" value={form.defaultWordCount} onChange={set('defaultWordCount')} placeholder="e.g. 1000" />
+        </label>
+        <label className="field">
+          <span>Default TTW (minutes)</span>
+          <input type="number" min="0" value={form.defaultTtwMinutes} onChange={set('defaultTtwMinutes')} placeholder="e.g. 90" />
         </label>
         <label className="field">
           <span>Onboarding date</span>

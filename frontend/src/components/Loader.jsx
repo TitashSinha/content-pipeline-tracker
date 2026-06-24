@@ -3,7 +3,7 @@ export default function Loader({ full, label }) {
     return (
       <div className="loader-full">
         <span className="spinner" />
-        {label && <p className="muted">{label}</p>}
+        {label && <p className="text-muted">{label}</p>}
       </div>
     );
   }

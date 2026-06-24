@@ -1,4 +1,5 @@
 import { IconPlus, IconClose } from '../lib/icons.jsx';
+import { IconButton, LinkButton } from './ui/index.js';
 
 // Controlled list of URL inputs with inline add/remove. Always renders at least
 // one row; empties are filtered by the caller before saving.
@@ -16,15 +17,15 @@ export default function LinkInputs({ value, onChange, placeholder }) {
         <div className="link-input-row" key={i}>
           <input value={link} onChange={(e) => update(i, e.target.value)} placeholder={placeholder} />
           {links.length > 1 && (
-            <button type="button" className="icon-btn" onClick={() => remove(i)} aria-label="Remove link">
+            <IconButton onClick={() => remove(i)} aria-label="Remove link">
               <IconClose />
-            </button>
+            </IconButton>
           )}
         </div>
       ))}
-      <button type="button" className="link-btn" onClick={() => onChange([...links, ''])}>
+      <LinkButton onClick={() => onChange([...links, ''])}>
         <IconPlus /> Add another link
-      </button>
+      </LinkButton>
     </div>
   );
 }

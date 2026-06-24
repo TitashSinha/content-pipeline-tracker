@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import { IconCalendar } from '../lib/icons.jsx';
+import { Button } from './ui/index.js';
 
 function fmtShort(d) {
   if (!d) return '';
@@ -129,15 +130,8 @@ export default function DatePickerPopover({ customFilter, onApply, onClear }) {
           )}
 
           <div className="date-picker-footer">
-            <button type="button" className="btn btn--ghost btn--sm" onClick={clear}>Clear</button>
-            <button
-              type="button"
-              className="btn btn--primary btn--sm"
-              disabled={!canApply}
-              onClick={apply}
-            >
-              Apply
-            </button>
+            <Button variant="ghost" size="sm" onClick={clear}>Clear</Button>
+            <Button size="sm" disabled={!canApply} onClick={apply}>Apply</Button>
           </div>
         </div>
       )}

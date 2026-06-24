@@ -16,6 +16,11 @@ const emptyDB = () => ({
   articles: [],
   activityLogs: [],
   archivedUsers: [], // "bin" for removed writers
+  templates: [], // reusable article briefs (Phase 2)
+  recurrences: [], // recurring content rules that auto-spawn articles (Phase 6)
+  notifications: [], // per-user notification feed (Phase 7)
+  comments: [], // threaded discussion on articles (Phase 7)
+  follows: [], // users watching articles they don't own (Phase 7)
 });
 
 let db = emptyDB();
@@ -29,11 +34,19 @@ export function load() {
     // Migrate the old single googleDocLink → referenceLinks array.
     for (const a of db.articles) {
       if (!a.referenceLinks) a.referenceLinks = a.googleDocLink ? [a.googleDocLink] : [];
+      // Writer Experience (Phase 3) — additive, backfill-safe article fields.
+      if (!('writerNotes' in a)) a.writerNotes = null; // private assignee scratchpad
+      if (!('pausedAt' in a)) a.pausedAt = null; // paused writing session (stops TTW clock)
     }
     // Backfill richer client fields added in later versions.
     for (const c of db.clients) {
       if (!('contentTypeId' in c)) c.contentTypeId = null;
       if (!c.sampleLinks) c.sampleLinks = [];
+      // Client defaults (Phase 2) — content type already covers "default type".
+      if (!('defaultWriterId' in c)) c.defaultWriterId = null;
+      if (!('defaultWordCount' in c)) c.defaultWordCount = null;
+      if (!('defaultTtwMinutes' in c)) c.defaultTtwMinutes = null;
+      if (!('defaultTemplateId' in c)) c.defaultTemplateId = null;
     }
   }
   return db;

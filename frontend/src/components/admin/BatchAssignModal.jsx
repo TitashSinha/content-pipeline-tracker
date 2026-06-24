@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Modal from '../Modal.jsx';
+import { Button, IconButton, LinkButton } from '../ui/index.js';
 import { api } from '../../api/client.js';
 import { useToast } from '../Toast.jsx';
 import { IconPlus, IconTrash } from '../../lib/icons.jsx';
@@ -19,6 +20,8 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [rows, setRows] = useState([EMPTY_ROW(defaultWriterId)]);
+  // Dirty once anything beyond the initial single (optionally pre-filled) row exists.
+  const dirty = rows.length > 1 || rows.some((r) => r.title || r.clientId || r.articleTypeId || r.deadline || r.briefNotes);
 
   function setRow(idx, patch) {
     setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
@@ -59,18 +62,19 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
   return (
     <Modal
       wide
+      dirty={dirty}
       title="Batch Assign"
       onClose={onClose}
       footer={
         <>
-          <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>Cancel</button>
-          <button type="submit" form="batch-form" className="btn btn--primary" disabled={busy}>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button type="submit" form="batch-form" disabled={busy}>
             {busy ? 'Creating…' : `Create ${rows.length} assignment${rows.length === 1 ? '' : 's'}`}
-          </button>
+          </Button>
         </>
       }
     >
-      <p className="muted batch-hint">
+      <p className="text-muted batch-hint">
         Create multiple assignments at once — useful when planning a writer's day or onboarding a new client with several pieces of work.
       </p>
       <form id="batch-form" onSubmit={submit}>
@@ -121,25 +125,20 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
                 onChange={(e) => setRow(idx, { deadline: e.target.value })}
               />
 
-              <button
-                type="button"
-                className="icon-btn icon-btn--danger"
+              <IconButton
+                tone="danger"
                 title="Remove row"
                 disabled={rows.length === 1}
                 onClick={() => removeRow(idx)}
               >
                 <IconTrash />
-              </button>
+              </IconButton>
             </div>
 
             <div className="batch-notes-bar">
-              <button
-                type="button"
-                className="link-btn"
-                onClick={() => setRow(idx, { notesOpen: !row.notesOpen })}
-              >
+              <LinkButton onClick={() => setRow(idx, { notesOpen: !row.notesOpen })}>
                 {row.notesOpen ? '− hide notes' : '＋ add brief notes'}
-              </button>
+              </LinkButton>
             </div>
 
             {row.notesOpen && (
@@ -154,9 +153,9 @@ export default function BatchAssignModal({ clients, writers, types, defaultWrite
           </div>
         ))}
 
-        <button type="button" className="btn btn--ghost btn--sm batch-add-btn" onClick={addRow}>
+        <Button variant="ghost" size="sm" className="batch-add-btn" onClick={addRow}>
           <IconPlus /> Add another
-        </button>
+        </Button>
       </form>
     </Modal>
   );

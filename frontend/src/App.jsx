@@ -1,10 +1,11 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import Loader from './components/Loader.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import ChangePasswordPage from './pages/ChangePasswordPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import SearchPage from './pages/SearchPage.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminArticlePage from './pages/admin/AdminArticlePage.jsx';
 import ClientsPage from './pages/admin/ClientsPage.jsx';
@@ -12,11 +13,16 @@ import ClientDetailPage from './pages/admin/ClientDetailPage.jsx';
 import WritersPage from './pages/admin/WritersPage.jsx';
 import WriterDetailPage from './pages/admin/WriterDetailPage.jsx';
 import ArticleTypesPage from './pages/admin/ArticleTypesPage.jsx';
+import TemplatesPage from './pages/admin/TemplatesPage.jsx';
+import AnalyticsPage from './pages/admin/AnalyticsPage.jsx';
+import RecurringPage from './pages/admin/RecurringPage.jsx';
+import ActivityPage from './pages/admin/ActivityPage.jsx';
 import WriterDashboard from './pages/writer/WriterDashboard.jsx';
 import WriterArticlePage from './pages/writer/WriterArticlePage.jsx';
 import TLDashboard from './pages/tl/TLDashboard.jsx';
 import TLArticlePage from './pages/tl/TLArticlePage.jsx';
 import TLMyContent from './pages/tl/TLMyContent.jsx';
+import TLTeam from './pages/tl/TLTeam.jsx';
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
@@ -27,43 +33,65 @@ function HomeRedirect() {
   return <Navigate to="/writer" replace />;
 }
 
-export default function App() {
-  // Route table — admin, writer, and shared (profile / password) areas.
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+// ROUTING: data router (createBrowserRouter) so dirty forms can block the
+// browser Back button via useBlocker in components/Modal.jsx. ProtectedRoute is
+// a layout route (renders <Layout><Outlet/></Layout>); role-gating lives there.
+export const router = createBrowserRouter(
+  [
+    { path: '/login', element: <LoginPage /> },
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/change-password" element={<ChangePasswordPage />} />
-      </Route>
+    {
+      element: <ProtectedRoute />,
+      children: [
+        { path: '/profile', element: <ProfilePage /> },
+        { path: '/change-password', element: <ChangePasswordPage /> },
+        { path: '/search', element: <SearchPage /> },
+      ],
+    },
 
-      <Route element={<ProtectedRoute role="ADMIN" />}>
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/writers" element={<WritersPage />} />
-        <Route path="/admin/clients" element={<ClientsPage />} />
-        <Route path="/admin/clients/:id" element={<ClientDetailPage />} />
-        <Route path="/admin/content-types" element={<ArticleTypesPage />} />
-      </Route>
+    {
+      element: <ProtectedRoute role="ADMIN" />,
+      children: [
+        { path: '/admin', element: <AdminDashboard /> },
+        { path: '/admin/analytics', element: <AnalyticsPage /> },
+        { path: '/admin/writers', element: <WritersPage /> },
+        { path: '/admin/clients', element: <ClientsPage /> },
+        { path: '/admin/clients/:id', element: <ClientDetailPage /> },
+        { path: '/admin/content-types', element: <ArticleTypesPage /> },
+        { path: '/admin/templates', element: <TemplatesPage /> },
+        { path: '/admin/recurring', element: <RecurringPage /> },
+        { path: '/admin/activity', element: <ActivityPage /> },
+      ],
+    },
 
-      {/* Article and writer detail accessible to both ADMIN and TEAM_LEADER */}
-      <Route element={<ProtectedRoute role={['ADMIN', 'TEAM_LEADER']} />}>
-        <Route path="/admin/articles/:id" element={<AdminArticlePage />} />
-        <Route path="/admin/writers/:id" element={<WriterDetailPage />} />
-      </Route>
+    // Article + writer detail are shared by ADMIN and TEAM_LEADER.
+    {
+      element: <ProtectedRoute role={['ADMIN', 'TEAM_LEADER']} />,
+      children: [
+        { path: '/admin/articles/:id', element: <AdminArticlePage /> },
+        { path: '/admin/writers/:id', element: <WriterDetailPage /> },
+      ],
+    },
 
-      <Route element={<ProtectedRoute role="TEAM_LEADER" />}>
-        <Route path="/tl" element={<TLDashboard />} />
-        <Route path="/tl/articles/:id" element={<TLArticlePage />} />
-        <Route path="/tl/my-content" element={<TLMyContent />} />
-      </Route>
+    {
+      element: <ProtectedRoute role="TEAM_LEADER" />,
+      children: [
+        { path: '/tl', element: <TLDashboard /> },
+        { path: '/tl/team', element: <TLTeam /> },
+        { path: '/tl/articles/:id', element: <TLArticlePage /> },
+        { path: '/tl/my-content', element: <TLMyContent /> },
+      ],
+    },
 
-      <Route element={<ProtectedRoute role="WRITER" />}>
-        <Route path="/writer" element={<WriterDashboard />} />
-        <Route path="/writer/articles/:id" element={<WriterArticlePage />} />
-      </Route>
+    {
+      element: <ProtectedRoute role="WRITER" />,
+      children: [
+        { path: '/writer', element: <WriterDashboard /> },
+        { path: '/writer/articles/:id', element: <WriterArticlePage /> },
+      ],
+    },
 
-      <Route path="*" element={<HomeRedirect />} />
-    </Routes>
-  );
-}
+    { path: '*', element: <HomeRedirect /> },
+  ],
+  { future: { v7_relativeSplatPath: true } },
+);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { api } from '../api/client.js';
 import { useToast } from '../components/Toast.jsx';
 import PasswordField from '../components/PasswordField.jsx';
+import { Button, Card } from '../components/ui/index.js';
 
 export default function ChangePasswordPage() {
   const toast = useToast();
@@ -28,7 +29,7 @@ export default function ChangePasswordPage() {
   return (
     <div className="page">
       <div className="page-head"><h1>Change Password</h1></div>
-      <div className="card narrow">
+      <Card narrow>
         <form onSubmit={submit} className="stack">
           <label className="field">
             <span>Current password</span>
@@ -42,11 +43,11 @@ export default function ChangePasswordPage() {
             <span>Confirm new password</span>
             <PasswordField value={form.confirm} onChange={set('confirm')} autoComplete="new-password" />
           </label>
-          <button type="submit" className="btn btn--primary" disabled={busy}>
+          <Button disabled={busy}>
             {busy ? 'Saving…' : 'Save'}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }

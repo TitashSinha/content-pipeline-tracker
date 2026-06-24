@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/client.js';
 import { useToast } from '../components/Toast.jsx';
 import Avatar from '../components/Avatar.jsx';
+import { Button, Card, CardTitle } from '../components/ui/index.js';
 import { formatDate, resizeImageToDataUrl } from '../lib/utils.js';
 import { IconKey, IconLogout, IconDashboard, IconEdit, IconUpload, IconTrash } from '../lib/icons.jsx';
 
@@ -75,11 +76,11 @@ export default function ProfilePage() {
       <div className="page-head">
         <div>
           <h1>Account</h1>
-          <p className="muted">Your profile and account settings.</p>
+          <p className="text-muted">Your profile and account settings.</p>
         </div>
       </div>
 
-      <div className="card profile-head">
+      <Card className="profile-head">
         <div className="profile-avatar" ref={menuRef}>
           <button
             type="button"
@@ -111,12 +112,12 @@ export default function ProfilePage() {
         <div className="profile-id">
           <h2>{user.name}</h2>
           <span className={`role-pill role-pill--${user.role.toLowerCase().replace('_', '-')}`}>{roleLabel}</span>
-          <p className="muted">{user.email}</p>
+          <p className="text-muted">{user.email}</p>
         </div>
-      </div>
+      </Card>
 
-      <div className="card">
-        <h2 className="card-title">Account details</h2>
+      <Card>
+        <CardTitle as="h2">Account details</CardTitle>
         <div className="detail-meta">
           <div className="meta-item"><span className="meta-label">Name</span><span className="meta-value">{user.name}</span></div>
           <div className="meta-item"><span className="meta-label">Email</span><span className="meta-value">{user.email}</span></div>
@@ -125,17 +126,17 @@ export default function ProfilePage() {
             <div className="meta-item"><span className="meta-label">Member since</span><span className="meta-value">{formatDate(user.createdAt)}</span></div>
           )}
         </div>
-      </div>
+      </Card>
 
-      <div className="card">
-        <h2 className="card-title">Security</h2>
-        <p className="muted profile-sec-text">Keep your account secure with a strong, unique password.</p>
+      <Card>
+        <CardTitle as="h2">Security</CardTitle>
+        <p className="text-muted profile-sec-text">Keep your account secure with a strong, unique password.</p>
         <Link to="/change-password" className="btn btn--ghost"><IconKey /> Change password</Link>
-      </div>
+      </Card>
 
       <div className="profile-actions">
         <Link to={home} className="btn btn--ghost"><IconDashboard /> Back to dashboard</Link>
-        <button type="button" className="btn btn--danger" onClick={handleLogout}><IconLogout /> Sign out</button>
+        <Button variant="danger" onClick={handleLogout}><IconLogout /> Sign out</Button>
       </div>
     </div>
   );

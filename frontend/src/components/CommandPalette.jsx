@@ -2,19 +2,17 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { IconSearch } from '../lib/icons.jsx';
-import { STATUS_LABELS } from '../lib/constants.js';
+import { STATUS_LABELS } from '../lib/workflow.js';
+import { readJson, writeJson } from '../lib/storage.js';
 
 const RECENT_KEY = 'cpt_recent_searches';
 const MAX_RECENT = 5;
 
-function getRecent() {
-  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
-  catch { return []; }
-}
+const getRecent = () => readJson(RECENT_KEY, []);
 function saveRecent(q) {
   if (!q?.trim()) return;
   const prev = getRecent().filter((s) => s !== q.trim());
-  try { localStorage.setItem(RECENT_KEY, JSON.stringify([q.trim(), ...prev].slice(0, MAX_RECENT))); } catch {}
+  writeJson(RECENT_KEY, [q.trim(), ...prev].slice(0, MAX_RECENT));
 }
 
 function useDebounce(v, d) {
@@ -113,6 +111,19 @@ export default function CommandPalette({ isOpen, onClose, userRole }) {
         </div>
 
         <div className="cmd-body">
+          {/* FEATURE: Advanced search — jump to the faceted search page. */}
+          <button
+            type="button"
+            className="cmd-item cmd-item--advanced"
+            onClick={() => { saveRecent(query); onClose(); navigate(query.trim() ? `/search?q=${encodeURIComponent(query.trim())}` : '/search'); }}
+          >
+            <IconSearch className="cmd-item-icon cmd-item-icon--muted" />
+            <span className="cmd-item-label">
+              {query.trim() ? <>Advanced search for <strong>“{query.trim()}”</strong></> : 'Open advanced search'}
+            </span>
+            <span className="cmd-item-tag cmd-item-tag--muted">filters</span>
+          </button>
+
           {showHint && recent.length === 0 && (
             <p className="cmd-hint">Start typing to search…</p>
           )}

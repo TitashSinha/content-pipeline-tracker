@@ -41,6 +41,8 @@ export const api = {
   createArticle: (body) => request('/articles', { method: 'POST', body }),
   batchCreateArticles: (articles) => request('/articles/batch', { method: 'POST', body: { articles } }),
   updateArticle: (id, body) => request(`/articles/${id}`, { method: 'PUT', body }),
+  bulkUpdateArticles: (ids, action, value) =>
+    request('/articles/bulk', { method: 'PATCH', body: { ids, action, value } }),
   deleteArticle: (id) => request(`/articles/${id}`, { method: 'DELETE' }),
   setStatus: (id, status, note) =>
     request(`/articles/${id}/status`, { method: 'POST', body: { status, note } }),
@@ -48,6 +50,9 @@ export const api = {
     request(`/articles/${id}/links`, { method: 'PUT', body: { referenceLinks } }),
   setTimeTaken: (id, minutes) =>
     request(`/articles/${id}/time-taken`, { method: 'PUT', body: { minutes } }),
+  pauseWriting: (id) => request(`/articles/${id}/pause`, { method: 'POST' }),
+  resumeWriting: (id) => request(`/articles/${id}/resume`, { method: 'POST' }),
+  setWriterNotes: (id, notes) => request(`/articles/${id}/notes`, { method: 'PUT', body: { notes } }),
 
   // reference data
   listClients: () => request('/clients'),
@@ -68,9 +73,32 @@ export const api = {
   createType: (name) => request('/article-types', { method: 'POST', body: { name } }),
   updateType: (id, name) => request(`/article-types/${id}`, { method: 'PUT', body: { name } }),
   deleteType: (id) => request(`/article-types/${id}`, { method: 'DELETE' }),
+  listTemplates: () => request('/templates'),
+  createTemplate: (body) => request('/templates', { method: 'POST', body }),
+  updateTemplate: (id, body) => request(`/templates/${id}`, { method: 'PUT', body }),
+  deleteTemplate: (id) => request(`/templates/${id}`, { method: 'DELETE' }),
+  listRecurrences: () => request('/recurrences'),
+  createRecurrence: (body) => request('/recurrences', { method: 'POST', body }),
+  updateRecurrence: (id, body) => request(`/recurrences/${id}`, { method: 'PUT', body }),
+  deleteRecurrence: (id) => request(`/recurrences/${id}`, { method: 'DELETE' }),
+  runRecurrence: (id) => request(`/recurrences/${id}/run`, { method: 'POST' }),
+
+  // collaboration (Phase 7)
+  listNotifications: () => request('/notifications'),
+  markNotificationRead: (id) => request(`/notifications/${id}/read`, { method: 'POST' }),
+  markAllNotificationsRead: () => request('/notifications/read-all', { method: 'POST' }),
+  listComments: (articleId) => request(`/comments/article/${articleId}`),
+  createComment: (body) => request('/comments', { method: 'POST', body }),
+  updateComment: (id, body) => request(`/comments/${id}`, { method: 'PUT', body: { body } }),
+  deleteComment: (id) => request(`/comments/${id}`, { method: 'DELETE' }),
+  followArticle: (id) => request(`/follows/article/${id}`, { method: 'POST' }),
+  unfollowArticle: (id) => request(`/follows/article/${id}`, { method: 'DELETE' }),
+  activityFeed: (params = '') => request(`/activity${params}`),
 
   // dashboard
   dashboard: () => request('/dashboard'),
+  myStats: () => request('/dashboard/me'),
+  analytics: () => request('/analytics'),
   searchAll: (q) => request(`/search?q=${encodeURIComponent(q)}`),
 
   // quote of the day

@@ -1,9 +1,6 @@
-import { STATUS_LABELS } from '../lib/constants.js';
+import Badge from './ui/Badge.jsx';
+import { STATUS_LABELS } from '../lib/workflow.js';
 
 export default function StatusBadge({ status, size }) {
-  return (
-    <span className={`badge badge--${status.toLowerCase()} ${size === 'lg' ? 'badge--lg' : ''}`}>
-      {STATUS_LABELS[status] ?? status}
-    </span>
-  );
+  return <Badge variant={status} size={size}>{STATUS_LABELS[status] ?? status}</Badge>;
 }

@@ -10,6 +10,8 @@ const publicClient = (db, c) => ({ ...c, contentTypeName: typeName(db, c.content
 const sanitizeLinks = (v) => (Array.isArray(v) ? v : []).map((s) => String(s).trim()).filter(Boolean);
 const cleanText = (v) => String(v ?? '').trim() || null;
 
+const num = (v) => (v === '' || v == null ? null : Number(v));
+
 function applyOptionalFields(c, b) {
   if ('industry' in b) c.industry = cleanText(b.industry);
   if ('competitors' in b) c.competitors = cleanText(b.competitors);
@@ -19,6 +21,11 @@ function applyOptionalFields(c, b) {
   if ('pilotDate' in b) c.pilotDate = b.pilotDate || null;
   if ('pilotNotes' in b) c.pilotNotes = cleanText(b.pilotNotes);
   if ('notes' in b) c.notes = cleanText(b.notes);
+  // Client defaults (Phase 2) — feed the auto-filled assignment form.
+  if ('defaultWriterId' in b) c.defaultWriterId = b.defaultWriterId ? Number(b.defaultWriterId) : null;
+  if ('defaultWordCount' in b) c.defaultWordCount = num(b.defaultWordCount);
+  if ('defaultTtwMinutes' in b) c.defaultTtwMinutes = num(b.defaultTtwMinutes);
+  if ('defaultTemplateId' in b) c.defaultTemplateId = b.defaultTemplateId ? Number(b.defaultTemplateId) : null;
 }
 
 // A client is unique on (name + content type) — same name with a different
@@ -63,6 +70,7 @@ router.post('/', authRequired, adminOnly, (req, res) => {
     contentTypeId,
     industry: null, competitors: null, website: null, sampleLinks: [],
     onboardingDate: null, pilotDate: null, pilotNotes: null, notes: null,
+    defaultWriterId: null, defaultWordCount: null, defaultTtwMinutes: null, defaultTemplateId: null,
   };
   applyOptionalFields(client, b);
   db.clients.push(client);

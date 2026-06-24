@@ -28,6 +28,7 @@ export default function QuoteBox() {
       ) : (
         <p className="quote-text quote-text--muted">Fetching a little inspiration…</p>
       )}
+      <span className="quote-glyph quote-glyph--close" aria-hidden="true">{'”'}</span>
     </div>
   );
 }

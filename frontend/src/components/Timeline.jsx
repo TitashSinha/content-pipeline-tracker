@@ -1,4 +1,4 @@
-import { STATUS_LABELS } from '../lib/constants.js';
+import { STATUS_LABELS } from '../lib/workflow.js';
 import { formatDateTime, initials } from '../lib/utils.js';
 
 function RoleChip({ role }) {
@@ -9,7 +9,7 @@ function RoleChip({ role }) {
 
 export default function Timeline({ entries }) {
   if (!entries?.length) {
-    return <p className="muted">No activity yet.</p>;
+    return <p className="text-muted">No activity yet.</p>;
   }
   return (
     <ul className="timeline">
@@ -17,9 +17,9 @@ export default function Timeline({ entries }) {
         <li key={e.id} className="timeline-item">
           <span className="timeline-avatar">{initials(e.changedByName || '?')}</span>
           <div className="timeline-body">
-            {e.kind === 'reassign' ? (
+            {e.kind === 'reassign' || e.kind === 'pause' || e.kind === 'resume' ? (
               <p className="timeline-head">
-                <strong>{e.changedByName || 'Admin'}</strong><RoleChip role={e.changedByRole} />
+                <strong>{e.changedByName || 'Someone'}</strong><RoleChip role={e.changedByRole} />
                 <span className="timeline-reassign">{e.note}</span>
               </p>
             ) : (

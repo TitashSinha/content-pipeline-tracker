@@ -6,6 +6,7 @@ import Loader from '../../components/Loader.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import Avatar from '../../components/Avatar.jsx';
 import WriterForm from '../../components/admin/WriterForm.jsx';
+import { Button, Card, CardTitle } from '../../components/ui/index.js';
 import { formatDate } from '../../lib/utils.js';
 import { IconArrowLeft, IconEdit, IconExternal } from '../../lib/icons.jsx';
 
@@ -46,26 +47,29 @@ export default function WriterDetailPage() {
             <Avatar user={writer} className="avatar--lg" />
             <div>
               <h1>{writer.name}</h1>
-              <p className="muted">{writer.email}</p>
+              <p className="text-muted">{writer.email}</p>
             </div>
           </div>
-          <button type="button" className="btn btn--ghost" onClick={() => setEditing(true)}><IconEdit /> Edit</button>
+          <Button variant="ghost" onClick={() => setEditing(true)}><IconEdit /> Edit</Button>
         </div>
 
-        <div className="card detail-meta">
+        <Card className="detail-meta">
           <Meta label="Specialties" value={writer.specialties} />
           <Meta label="Joined" value={writer.joinedDate ? formatDate(writer.joinedDate) : null} />
           <Meta label="Active articles" value={String(writer.activeArticles)} />
           <Meta label="Total articles" value={String(writer.totalArticles)} />
-        </div>
+        </Card>
 
         {writer.bio && (
-          <div className="card"><h2 className="card-title">Bio</h2><p className="brief-notes">{writer.bio}</p></div>
+          <Card>
+            <CardTitle as="h2">Bio</CardTitle>
+            <p className="brief-notes">{writer.bio}</p>
+          </Card>
         )}
 
         {writer.portfolioLinks?.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">Portfolio</h2>
+          <Card>
+            <CardTitle as="h2">Portfolio</CardTitle>
             <ul className="ref-link-list">
               {writer.portfolioLinks.map((l, i) => (
                 <li key={i}>
@@ -75,16 +79,19 @@ export default function WriterDetailPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
 
         {writer.notes && (
-          <div className="card"><h2 className="card-title">Notes</h2><p className="brief-notes">{writer.notes}</p></div>
+          <Card>
+            <CardTitle as="h2">Notes</CardTitle>
+            <p className="brief-notes">{writer.notes}</p>
+          </Card>
         )}
 
         {articles.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">Assigned content</h2>
+          <Card>
+            <CardTitle as="h2">Assigned content</CardTitle>
             <ul className="writer-articles">
               {articles.map((a) => (
                 <li key={a.id}>
@@ -95,7 +102,7 @@ export default function WriterDetailPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
       </div>
 

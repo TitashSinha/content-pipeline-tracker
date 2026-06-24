@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Modal from '../Modal.jsx';
 import LinkInputs from '../LinkInputs.jsx';
 import PasswordField from '../PasswordField.jsx';
 import { api } from '../../api/client.js';
 import { useToast } from '../Toast.jsx';
+import { Button } from '../ui/index.js';
 
 const toDateInput = (iso) => (iso ? new Date(iso).toISOString().slice(0, 10) : '');
 
@@ -11,7 +12,7 @@ export default function WriterForm({ writer, onClose, onSaved }) {
   const editing = !!writer;
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({
+  const initial = {
     name: writer?.name || '',
     email: writer?.email || '',
     password: '',
@@ -21,7 +22,10 @@ export default function WriterForm({ writer, onClose, onSaved }) {
     portfolioLinks: writer?.portfolioLinks?.length ? writer.portfolioLinks : [''],
     notes: writer?.notes || '',
     isTeamLeader: writer?.isTeamLeader || false,
-  });
+  };
+  const [form, setForm] = useState(initial);
+  const initialJson = useRef(JSON.stringify(initial));
+  const dirty = JSON.stringify(form) !== initialJson.current;
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   async function submit(e) {
@@ -59,14 +63,15 @@ export default function WriterForm({ writer, onClose, onSaved }) {
   return (
     <Modal
       wide
+      dirty={dirty}
       title={editing ? 'Edit writer' : 'Add writer'}
       onClose={onClose}
       footer={
         <>
-          <button type="button" className="btn btn--ghost" onClick={onClose} disabled={busy}>Cancel</button>
-          <button type="submit" form="writer-form" className="btn btn--primary" disabled={busy}>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button type="submit" form="writer-form" disabled={busy}>
             {busy ? 'Saving…' : 'Save'}
-          </button>
+          </Button>
         </>
       }
     >

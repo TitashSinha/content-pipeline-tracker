@@ -1,4 +1,4 @@
-import { STATUS_LABELS } from './constants.js';
+import { STATUS_LABELS, isActive } from './workflow.js';
 
 export function formatDate(iso) {
   if (!iso) return '—';
@@ -18,7 +18,7 @@ export function formatDateTime(iso) {
 export function isOverdue(article) {
   return !!(
     article.deadline &&
-    article.status !== 'COMPLETED' &&
+    isActive(article.status) &&
     new Date(article.deadline) < new Date()
   );
 }
@@ -48,8 +48,31 @@ export function ttwDisplay(article) {
   return target != null ? formatTTW(target) : '—';
 }
 
-export function statusLabel(status) {
-  return STATUS_LABELS[status] ?? status;
+/** Escape a single CSV cell (quote if it contains a comma, quote or newline). */
+const csvCell = (v) => {
+  const s = String(v ?? '');
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+// Build + download a CSV of the given article rows. Shared by the dashboard's
+// full export and the bulk "Export selected" action.
+export function exportArticlesCsv(rows, filename) {
+  const headers = ['Title', 'Client', 'Type', 'Writer', 'Status', 'Deadline', 'Word Count Target', 'TTW', 'Reference Links'];
+  const lines = [headers.join(',')];
+  for (const a of rows) {
+    lines.push([
+      a.title, a.clientName, a.typeName, a.writerName, STATUS_LABELS[a.status] ?? a.status,
+      a.deadline ? formatDate(a.deadline) : '', a.wordCountTarget ?? '',
+      ttwDisplay(a), (a.referenceLinks || []).join(' | '),
+    ].map(csvCell).join(','));
+  }
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 /** Center-crop + scale an image File to a square JPEG data URL (default 256px). */
@@ -70,6 +93,43 @@ export function resizeImageToDataUrl(file, size = 256) {
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
     img.src = url;
   });
+}
+
+// FEATURE: Duplicate Detection
+// Normalize a title to letters+digits so punctuation/casing/spacing don't hide
+// near-identical pieces, then match exact or substring (length-guarded to avoid
+// noise). Same-client matches are surfaced first. Advisory only — never blocks.
+const normalizeTitle = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+export function findSimilarArticles(title, articles, { clientId, excludeId } = {}) {
+  const n = normalizeTitle(title);
+  if (n.length < 4) return [];
+  const sameClient = (a) => clientId && String(a.clientId) === String(clientId);
+  return articles
+    .filter((a) => a.id !== excludeId && a.title)
+    .filter((a) => {
+      const an = normalizeTitle(a.title);
+      return an === n || (n.length >= 6 && an.includes(n)) || (an.length >= 6 && n.includes(an));
+    })
+    .sort((a, b) => (sameClient(b) ? 1 : 0) - (sameClient(a) ? 1 : 0))
+    .slice(0, 3);
+}
+
+// FEATURE: Quick-duplicate (Phase 6) — a create-form seed cloned from an existing
+// piece. No `id` (so ArticleForm opens in create mode), title marked "(copy)", and
+// deadline cleared so a fresh one is set (the form's Suggest button helps here).
+export function articleDuplicateSeed(a) {
+  return {
+    title: `${a.title} (copy)`,
+    clientId: a.clientId,
+    articleTypeId: a.articleTypeId,
+    assignedWriterId: a.assignedWriterId,
+    deadline: null,
+    wordCountTarget: a.wordCountTarget ?? '',
+    ttwTargetMinutes: a.ttwTargetMinutes ?? '',
+    briefNotes: a.briefNotes || '',
+    referenceLinks: a.referenceLinks?.length ? a.referenceLinks : [''],
+  };
 }
 
 export function initials(name = '') {

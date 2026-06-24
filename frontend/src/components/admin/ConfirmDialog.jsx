@@ -1,4 +1,5 @@
 import Modal from '../Modal.jsx';
+import { Button } from '../ui/index.js';
 
 export default function ConfirmDialog({
   title = 'Are you sure?',
@@ -14,10 +15,10 @@ export default function ConfirmDialog({
       onClose={onCancel}
       footer={
         <>
-          <button type="button" className="btn btn--ghost" onClick={onCancel} disabled={busy}>Cancel</button>
-          <button type="button" className="btn btn--danger" onClick={onConfirm} disabled={busy}>
+          <Button variant="ghost" onClick={onCancel} disabled={busy}>Cancel</Button>
+          <Button variant="danger" onClick={onConfirm} disabled={busy}>
             {busy ? 'Working…' : confirmLabel}
-          </button>
+          </Button>
         </>
       }
     >

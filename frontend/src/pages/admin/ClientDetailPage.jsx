@@ -5,6 +5,7 @@ import Loader from '../../components/Loader.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import ClientForm from '../../components/admin/ClientForm.jsx';
 import ArticleForm from '../../components/admin/ArticleForm.jsx';
+import { Button, LinkButton, Card, CardTitle } from '../../components/ui/index.js';
 import { formatDate } from '../../lib/utils.js';
 import { IconArrowLeft, IconEdit, IconExternal, IconPlus } from '../../lib/icons.jsx';
 
@@ -25,6 +26,7 @@ export default function ClientDetailPage() {
   const [types, setTypes] = useState([]);
   const [clients, setClients] = useState([]);
   const [writers, setWriters] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [articles, setArticles] = useState([]);
   const [editing, setEditing] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -45,6 +47,7 @@ export default function ClientDetailPage() {
     api.listTypes().then(setTypes);
     api.listClients().then(setClients);
     api.listWriters().then(setWriters);
+    api.listTemplates().then(setTemplates);
     loadArticles();
   }, [id]);
 
@@ -72,17 +75,17 @@ export default function ClientDetailPage() {
         <div className="page-head">
           <div>
             <h1>{client.name}</h1>
-            <p className="muted">{client.contentTypeName ?? 'No content type'}</p>
+            <p className="text-muted">{client.contentTypeName ?? 'No content type'}</p>
           </div>
           <div className="page-head-actions">
-            <button type="button" className="btn btn--primary" onClick={() => setCreating(true)}>
+            <Button onClick={() => setCreating(true)}>
               <IconPlus /> New content
-            </button>
-            <button type="button" className="btn btn--ghost" onClick={() => setEditing(true)}><IconEdit /> Edit</button>
+            </Button>
+            <Button variant="ghost" onClick={() => setEditing(true)}><IconEdit /> Edit</Button>
           </div>
         </div>
 
-        <div className="card detail-meta">
+        <Card className="detail-meta">
           <Meta label="Industry" value={client.industry} />
           <Meta
             label="Website"
@@ -93,18 +96,18 @@ export default function ClientDetailPage() {
           <Meta label="Competitors" value={client.competitors} />
           <Meta label="Onboarded" value={client.onboardingDate ? formatDate(client.onboardingDate) : null} />
           <Meta label="Pilot date" value={client.pilotDate ? formatDate(client.pilotDate) : null} />
-        </div>
+        </Card>
 
         {client.pilotNotes && (
-          <div className="card">
-            <h2 className="card-title">The pilot</h2>
+          <Card>
+            <CardTitle as="h2">The pilot</CardTitle>
             <p className="brief-notes">{client.pilotNotes}</p>
-          </div>
+          </Card>
         )}
 
         {client.sampleLinks?.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">Sample work</h2>
+          <Card>
+            <CardTitle as="h2">Sample work</CardTitle>
             <ul className="ref-link-list">
               {client.sampleLinks.map((l, i) => (
                 <li key={i}>
@@ -114,64 +117,62 @@ export default function ClientDetailPage() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
 
         {client.notes && (
-          <div className="card">
-            <h2 className="card-title">Notes</h2>
+          <Card>
+            <CardTitle as="h2">Notes</CardTitle>
             <p className="brief-notes">{client.notes}</p>
-          </div>
+          </Card>
         )}
 
         {active.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">Active content ({active.length})</h2>
+          <Card>
+            <CardTitle as="h2">Active content ({active.length})</CardTitle>
             <ul className="writer-articles">
               {active.map((a) => (
                 <li key={a.id}>
                   <Link to={`/admin/articles/${a.id}`} className="writer-article-link">
                     <span className="writer-article-title">{a.title}</span>
                     <span className="writer-article-meta">
-                      {a.writerName && <span className="muted">{a.writerName}</span>}
-                      {a.deadline && <span className="muted">{formatDate(a.deadline)}</span>}
+                      {a.writerName && <span className="text-muted">{a.writerName}</span>}
+                      {a.deadline && <span className="text-muted">{formatDate(a.deadline)}</span>}
                     </span>
                     <StatusBadge status={a.status} />
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
 
         {completed.length > 0 && (
-          <div className="card">
-            <h2 className="card-title">Completed ({completed.length})</h2>
+          <Card>
+            <CardTitle as="h2">Completed ({completed.length})</CardTitle>
             <ul className="writer-articles">
               {completed.map((a) => (
                 <li key={a.id}>
                   <Link to={`/admin/articles/${a.id}`} className="writer-article-link">
                     <span className="writer-article-title">{a.title}</span>
                     <span className="writer-article-meta">
-                      {a.writerName && <span className="muted">{a.writerName}</span>}
+                      {a.writerName && <span className="text-muted">{a.writerName}</span>}
                     </span>
                     <StatusBadge status={a.status} />
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
         )}
 
         {articles.length === 0 && (
-          <div className="card">
-            <p className="muted" style={{ textAlign: 'center', padding: '1rem 0' }}>
+          <Card>
+            <p className="text-muted text-center py-4">
               No content yet for this client.{' '}
-              <button type="button" className="link-btn" onClick={() => setCreating(true)}>
-                Create the first piece →
-              </button>
+              <LinkButton onClick={() => setCreating(true)}>Create the first piece →</LinkButton>
             </p>
-          </div>
+          </Card>
         )}
       </div>
 
@@ -179,6 +180,8 @@ export default function ClientDetailPage() {
         <ClientForm
           client={client}
           types={types}
+          writers={writers}
+          templates={templates}
           onClose={() => setEditing(false)}
           onSaved={() => { setEditing(false); load(); }}
         />
@@ -190,6 +193,8 @@ export default function ClientDetailPage() {
           clients={clients}
           writers={writers}
           types={types}
+          articles={articles}
+          templates={templates}
           onClose={() => setCreating(false)}
           onSaved={() => { setCreating(false); loadArticles(); }}
         />
