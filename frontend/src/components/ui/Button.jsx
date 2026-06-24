@@ -42,7 +42,7 @@ export function LinkButton({ type = 'button', className, ...props }) {
     <button
       type={type}
       className={cn(
-        'border-none bg-transparent p-1 text-[.85rem] font-semibold text-primary enabled:hover:underline',
+        'inline-flex items-center gap-1.5 border-none bg-transparent p-1 text-[.85rem] font-semibold text-primary [&_svg]:size-[14px] enabled:hover:underline',
         className,
       )}
       {...props}

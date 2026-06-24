@@ -416,7 +416,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .table tbody tr:nth-child(8)  { animation-delay: .16s; }
 .row-overdue { background: var(--color-warning-soft); }
 .row-overdue:hover { background: var(--color-warning-soft); }
-.col-actions { white-space: nowrap; text-align: right; }
+.col-actions { white-space: nowrap; text-align: right; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
 
 .doc-pill {
   display: inline-flex; align-items: center; gap: 4px; font-weight: 600; font-size: .8rem;
@@ -1534,7 +1534,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .kpi-card--warn { border-color: var(--color-warning-border); background: var(--color-warning-soft); }
 .kpi-card--warn .kpi-value { color: var(--color-warning); }
 
-.trend { font-size: .8rem; font-weight: 700; }
+.trend { font-size: .7rem; font-weight: 700; margin-left: 6px; }
 .trend--up { color: var(--color-success-strong); }
 .trend--down { color: var(--danger); }
 
