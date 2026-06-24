@@ -76,7 +76,7 @@ export function WorkloadRow({ writer, busiest }) {
           {writer.role === 'TEAM_LEADER' && <span className="role-chip role-chip--tl">TL</span>}
         </span>
         <div className="workload-bar">
-          <span className="workload-fill" style={{ width: `${(writer.active / busiest) * 100}%` }} />
+          <span className="workload-fill" style={{ '--fill': `${(writer.active / busiest) * 100}%` }} />
         </div>
       </div>
       <span className="workload-count">{writer.active}</span>

@@ -6,7 +6,7 @@
 // print stylesheet drops the app chrome (see index.css @media print).
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import { Button, Card, CardTitle } from '../../components/ui/index.js';
 import { formatTTW, formatDateTime, initials } from '../../lib/utils.js';
@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
     return { sla: slaSummary(articles, now), forecast, dueNext7, overdueCarry, unscheduled };
   }, [articles]);
 
-  if (data === null || !snapshot) return <Loader full />;
+  if (data === null || !snapshot) return <div className="page"><SkeletonPage /></div>;
   if (data === false) return <div className="page"><p className="form-error">Could not load analytics.</p></div>;
 
   const { totals, velocity, clients, writers } = data;
@@ -129,8 +129,8 @@ export default function AnalyticsPage() {
                   <span className="text-muted text-[.8rem]"> · limit {formatAge(s.limitMs)}</span>
                 </span>
                 <span className="sla-bar">
-                  <span className="sla-fill-ok" style={{ width: `${pct}%` }} />
-                  <span className="sla-fill-over" style={{ width: `${100 - pct}%` }} />
+                  <span className="sla-fill-ok" style={{ '--fill': `${pct}%` }} />
+                  <span className="sla-fill-over" style={{ '--fill': `${100 - pct}%` }} />
                 </span>
                 <span className="sla-meta">
                   {s.count === 0 ? <span className="text-muted">none</span>

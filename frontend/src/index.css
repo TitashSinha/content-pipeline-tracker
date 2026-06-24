@@ -354,7 +354,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 
 .stage-panel { grid-row: span 1; }
 .stage-panel-body { display: flex; align-items: center; gap: 18px; }
-.donut { flex-shrink: 0; }
+.donut { flex-shrink: 0; animation: fade .4s ease .3s both; }
 .donut-num { font-size: 1.5rem; font-weight: 800; fill: var(--text); }
 .donut-cap { font-size: .66rem; fill: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 .stage-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1; }
@@ -375,7 +375,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .workload-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 .workload-name { font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .workload-bar { height: 7px; border-radius: 999px; background: var(--primary-soft); overflow: hidden; }
-.workload-fill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--peach)); min-width: 4px; }
+.workload-fill { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--peach)); min-width: 4px; width: var(--fill, 0%); animation: barFill .65s cubic-bezier(0,0,.2,1) both; }
 .workload-count { font-weight: 700; font-size: .95rem; min-width: 18px; text-align: right; }
 
 /* ---------- Filter bar ---------- */
@@ -402,6 +402,15 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .table th.sortable svg { vertical-align: -2px; margin-left: 3px; }
 .table td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: .88rem; vertical-align: middle; }
 .table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr { animation: fadeUp .18s ease both; }
+.table tbody tr:nth-child(1)  { animation-delay: .02s; }
+.table tbody tr:nth-child(2)  { animation-delay: .04s; }
+.table tbody tr:nth-child(3)  { animation-delay: .06s; }
+.table tbody tr:nth-child(4)  { animation-delay: .08s; }
+.table tbody tr:nth-child(5)  { animation-delay: .10s; }
+.table tbody tr:nth-child(6)  { animation-delay: .12s; }
+.table tbody tr:nth-child(7)  { animation-delay: .14s; }
+.table tbody tr:nth-child(8)  { animation-delay: .16s; }
 .row-overdue { background: var(--color-warning-soft); }
 .row-overdue:hover { background: var(--color-warning-soft); }
 .col-actions { white-space: nowrap; text-align: right; }
@@ -601,6 +610,10 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .anim-delay-1 { animation-delay: .07s; }
 .anim-delay-2 { animation-delay: .14s; }
 .anim-delay-3 { animation-delay: .21s; }
+
+/* Bar fill — set --fill on the element via inline style */
+@keyframes barFill { from { width: 0; } to { width: var(--fill, 100%); } }
+@keyframes slaFill { from { width: 0; } to { width: var(--fill, 0%); } }
 
 /* ---------- Article detail ---------- */
 .detail { display: flex; flex-direction: column; gap: 18px; }
@@ -1251,6 +1264,7 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 
 @media (min-width: 961px) {
   .app-shell--collapsed { --sidebar-w: 78px; }
+  .brand-text, .nav-link span { transition: opacity .15s ease; }
   .app-shell--collapsed .brand-text,
   .app-shell--collapsed .nav-link span,
   .app-shell--collapsed .quote-box { display: none; }
@@ -1400,7 +1414,8 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 
 /* ---------- Team pulse strip ---------- */
 .team-pulse { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 8px; }
-.pulse-stat { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 18px; }
+.pulse-stat { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 18px; transition: box-shadow .18s ease, transform .18s ease; }
+.pulse-stat:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
 .pulse-value { font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
 .pulse-label { font-size: .82rem; color: var(--muted); font-weight: 600; }
 .pulse-stat--warn { border-color: var(--color-warning-border); background: var(--color-warning-soft); }
@@ -1486,7 +1501,8 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 
 /* ---------- KPI strip ---------- */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
-.kpi-card { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 18px; }
+.kpi-card { display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 16px 18px; transition: box-shadow .18s ease, transform .18s ease; }
+.kpi-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
 .kpi-value { font-size: 1.7rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; display: flex; align-items: baseline; gap: 8px; }
 .kpi-label { font-size: .82rem; color: var(--muted); font-weight: 600; }
 .kpi-sub { font-size: .74rem; color: var(--muted); margin-top: 2px; }
@@ -1514,8 +1530,8 @@ code { background: var(--primary-soft); padding: .1em .4em; border-radius: 6px; 
 .sla-row { display: grid; grid-template-columns: 200px 1fr 80px; align-items: center; gap: 14px; }
 .sla-label { display: flex; align-items: center; gap: 7px; font-size: .85rem; font-weight: 600; }
 .sla-bar { display: flex; height: 9px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
-.sla-fill-ok { background: var(--success); }
-.sla-fill-over { background: var(--danger); }
+.sla-fill-ok { background: var(--success); width: var(--fill, 0%); animation: slaFill .6s cubic-bezier(0,0,.2,1) both; }
+.sla-fill-over { background: var(--danger); width: var(--fill, 0%); animation: slaFill .6s cubic-bezier(0,0,.2,1) .06s both; }
 .sla-meta { font-size: .8rem; font-weight: 600; text-align: right; }
 .sla-clear { color: var(--color-success-strong); }
 

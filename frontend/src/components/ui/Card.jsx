@@ -6,6 +6,7 @@ export default function Card({ noPad = false, narrow = false, as: As = 'div', cl
     <As
       className={cn(
         'bg-surface border border-border rounded-[var(--radius)] shadow-[var(--shadow-sm)]',
+        'transition-[box-shadow,transform] duration-[180ms] hover:shadow-[var(--shadow)] hover:-translate-y-px',
         noPad ? 'p-0 overflow-hidden' : 'p-5',
         narrow && 'max-w-[460px]',
         className,

@@ -43,6 +43,7 @@ export default function StatCard({ tone = 'blue', label, value, hint, icon, clas
     <div
       className={cn(
         'relative overflow-hidden flex flex-col gap-0.5 p-5 border border-border rounded-[var(--radius)] shadow-[var(--shadow-sm)]',
+        'transition-[box-shadow,transform] duration-[180ms] hover:shadow-[var(--shadow)] hover:-translate-y-px',
         "before:content-[''] before:absolute before:left-0 before:top-[18px] before:bottom-[18px] before:w-[3px] before:rounded-r-[3px] before:opacity-85",
         TONES[tone],
         className,

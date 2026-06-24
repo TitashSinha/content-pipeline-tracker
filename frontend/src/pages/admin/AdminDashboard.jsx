@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
-import Loader from '../../components/Loader.jsx';
+import { SkeletonPage } from '../../components/Skeleton.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import Modal from '../../components/Modal.jsx';
 import ArticleForm from '../../components/admin/ArticleForm.jsx';
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
     'mod+/': () => searchRef.current?.focus(),
   }, { enabled: !modalOpen });
 
-  if (!data) return <Loader full />;
+  if (!data) return <div className="page"><SkeletonPage /></div>;
 
   const { stats } = data;
   const busiest = Math.max(1, ...stats.workload.map((w) => w.active));
