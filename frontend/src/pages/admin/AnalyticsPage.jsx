@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
         <div className="table-head-pad"><CardTitle as="h2">Client health</CardTitle></div>
         {activeClients.length === 0 ? (
           <EmptyState title="No clients yet" message="Client metrics appear once content is assigned." />
-        ) : (
+        ) : (<>
           <div className="table-scroll">
             <table className="table analytics-table">
               <thead>
@@ -172,7 +172,8 @@ export default function AnalyticsPage() {
               </tbody>
             </table>
           </div>
-        )}
+          <div className="table-bot-pad" />
+        </>)}
       </Card>
 
       {/* Writer trends */}
@@ -180,7 +181,7 @@ export default function AnalyticsPage() {
         <div className="table-head-pad"><CardTitle as="h2">Writer trends</CardTitle></div>
         {activeWriters.length === 0 ? (
           <EmptyState title="No writers yet" message="Throughput appears once writers complete work." />
-        ) : (
+        ) : (<>
           <div className="table-scroll">
             <table className="table analytics-table">
               <thead>
@@ -212,7 +213,8 @@ export default function AnalyticsPage() {
               </tbody>
             </table>
           </div>
-        )}
+          <div className="table-bot-pad" />
+        </>)}
       </Card>
     </div>
   );

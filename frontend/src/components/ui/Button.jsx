@@ -4,14 +4,14 @@ import { cn } from './cn.js';
 // Replaces the legacy .btn / .btn--* classes.
 const BASE =
   'inline-flex items-center justify-center gap-[7px] whitespace-nowrap rounded-[var(--radius-sm)] ' +
-  'border border-transparent font-semibold transition-[transform,background,box-shadow,border-color] ' +
+  'border font-semibold transition-[transform,background,box-shadow,border-color] ' +
   'duration-150 active:scale-[0.96] active:translate-y-px disabled:opacity-[.55] disabled:cursor-not-allowed [&_svg]:size-[17px]';
 
 const VARIANTS = {
-  primary: 'bg-primary text-on-primary shadow-[var(--shadow-sm)] enabled:hover:bg-primary-hover',
-  ghost:   'bg-surface text-ink border-border-strong enabled:hover:bg-surface-2',
-  success: 'bg-success-strong text-white enabled:hover:brightness-[1.06]',
-  danger:  'bg-danger text-white enabled:hover:brightness-[.95]',
+  primary: 'bg-primary text-on-primary border-transparent shadow-[var(--shadow-sm)] enabled:hover:bg-primary-hover',
+  ghost:   'bg-surface text-ink border-[var(--color-border-strong)] enabled:hover:bg-surface-2',
+  success: 'bg-success-strong text-white border-transparent enabled:hover:brightness-[1.06]',
+  danger:  'bg-danger text-white border-transparent enabled:hover:brightness-[.95]',
 };
 
 const SIZES = {
