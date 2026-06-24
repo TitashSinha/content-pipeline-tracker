@@ -260,7 +260,7 @@ export function buildSeedData() {
     });
   });
 
-  return { users, clients, articleTypes, articles, activityLogs, archivedUsers: [] };
+  return { users, clients, articleTypes, articles, activityLogs, archivedUsers: [], templates: [], recurrences: [], notifications: [], comments: [], follows: [] };
 }
 
 /** Populate the DB only if it has no users yet. */
